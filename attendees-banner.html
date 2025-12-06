@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendees Banner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .attendees-banner {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .banner-text {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .view-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .view-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .view-button:active {
+            transform: translateY(0);
+        }
+
+        .email-dropdown {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 15px;
+            min-width: 200px;
+            outline: none;
+        }
+
+        .email-dropdown option {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+        }
+
+        .email-dropdown:focus {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .banner-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .email-dropdown {
+            display: none;
+        }
+
+        .no-emails-message {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .attendees-content {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .attendees-content iframe {
+            width: 100%;
+            height: 80vh;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .close-button {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: #d32f2f;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Attendees Banner -->
+        <div class="attendees-banner">
+            <div class="banner-text" id="bannerText">
+                LIST Attendees
+            </div>
+            <div class="banner-controls">
+                <a href="#" class="view-button" id="viewButton">View</a>
+            </div>
+        </div>
+
+        <!-- Attendees Content (hidden by default) -->
+        <div class="attendees-content" id="attendeesContent">
+            <button class="close-button" id="closeButton">✕ Close</button>
+            <iframe id="attendeesIframe" src="" title="Attendees List"></iframe>
+        </div>
+
+    </div>
+
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Handle view button click
+            document.getElementById('viewButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show attendees content in center
+                const attendeesContent = document.getElementById('attendeesContent');
+                const attendeesIframe = document.getElementById('attendeesIframe');
+                const banner = document.querySelector('.attendees-banner');
+                
+                // Load the attendees page
+                attendeesIframe.src = 'listofattendees.html';
+                
+                // Show the content
+                attendeesContent.style.display = 'block';
+                banner.style.marginBottom = '0';
+                
+                // Change button text
+                this.textContent = 'Hide';
+            });
+
+            // Handle close button click
+            document.getElementById('closeButton').addEventListener('click', function() {
+                const attendeesContent = document.getElementById('attendeesContent');
+                const banner = document.querySelector('.attendees-banner');
+                const viewButton = document.getElementById('viewButton');
+                
+                // Hide the content
+                attendeesContent.style.display = 'none';
+                banner.style.marginBottom = '30px';
+                
+                // Change button text back
+                viewButton.textContent = 'View';
+            });
+        });
+
+        // Add some interactive effects
+        const banner = document.querySelector('.attendees-banner');
+        
+        banner.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 6px 20px rgba(76, 175, 80, 0.4)';
+        });
+        
+        banner.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 15px rgba(76, 175, 80, 0.3)';
+        });
+    </script>
+</body>
+</html>

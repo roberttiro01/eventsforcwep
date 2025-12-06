@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Email</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      margin: 0; padding: 0; background: #f6f7fb; color: #1f2937;
+      display: flex; align-items: center; justify-content: center; min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .container { width: 100%; max-width: 720px; padding: 24px; }
+    .card {
+      background: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      padding: 24px; border: 1px solid #e5e7eb;
+    }
+    h1 { font-size: 24px; margin: 0 0 4px; }
+    p.subtitle { margin: 0 0 20px; color: #6b7280; }
+    form { display: grid; gap: 14px; }
+    label { font-weight: 600; font-size: 14px; margin-bottom: 6px; display: inline-block; }
+    input, textarea {
+      width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 8px;
+      padding: 10px 12px; font-size: 14px; background: #fff; color: #111827;
+    }
+    textarea { 
+      min-height: 140px; 
+      resize: vertical; 
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    textarea::-webkit-scrollbar { /* WebKit */
+      display: none;
+    }
+    .row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .row.two { grid-template-columns: 1fr 1fr; } }
+    .actions { display: flex; gap: 12px; align-items: center; }
+    button {
+      background: #22c55e; color: #fff; border: none; border-radius: 8px; padding: 10px 16px;
+      font-weight: 600; cursor: pointer; transition: background 0.2s ease; font-size: 14px;
+    }
+    button:hover { background: #16a34a; }
+    button:disabled { background: #86efac; cursor: not-allowed; }
+    .secondary { background: #111827; }
+    .secondary:hover { background: #0b1220; }
+    .status { margin-top: 10px; font-size: 14px; }
+    .status.success { color: #065f46; }
+    .status.error { color: #b91c1c; }
+    .help { font-size: 12px; color: #6b7280; }
+    
+    /* Remove scrollbars from all elements */
+    select {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    select::-webkit-scrollbar { /* WebKit */
+      display: none;
+    }
+    
+    /* Ensure no page-level scrollbars */
+    html, body {
+      overflow-x: hidden;
+    }
+    
+    /* Hide scrollbars but keep functionality */
+    * {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    *::-webkit-scrollbar { /* WebKit */
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Send Email</h1>
+      <p class="subtitle">Use this form to send emails via the server.</p>
+      
+      <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2563eb;">
+        <h3 style="margin: 0 0 10px; color: #2563eb;">Email Types</h3>
+        <p style="margin: 0; font-size: 14px; color: #6b7280;">
+          <strong>Regular Email:</strong> Send custom messages<br>
+          <strong>RSVP Invitation:</strong> Send wedding RSVP form to guests
+        </p>
+      </div>
+
+      <form id="emailForm" novalidate>
+        <div>
+          <label for="to">To</label>
+          <input id="to" name="to" type="email" placeholder="recipient@example.com" required />
+          <div class="help">Enter a valid email address.</div>
+        </div>
+
+        <div class="row two">
+          <div>
+            <label for="subject">Subject</label>
+            <input id="subject" name="subject" type="text" placeholder="Subject" required />
+          </div>
+          <div>
+            <label for="from">From (optional)</label>
+            <input id="from" name="from" type="email" placeholder="your-email@gmail.com" />
+            <div class="help">Displayed only in UI; server currently uses configured sender.</div>
+          </div>
+        </div>
+
+        <div>
+          <label for="emailType">Email Type</label>
+          <select id="emailType" name="emailType" style="width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 12px; font-size: 14px; background: #fff; color: #111827;">
+            <option value="regular">Regular Email</option>
+            <option value="rsvp">RSVP Invitation</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="imageAttachment">Image Attachment (optional)</label>
+          <input id="imageAttachment" name="imageAttachment" type="file" accept="image/*" style="width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 12px; font-size: 14px; background: #fff; color: #111827;" />
+          <div class="help">Select an image file to attach to your email (JPG, PNG, GIF, etc.)</div>
+          <div id="imagePreview" style="margin-top: 10px; display: none;">
+            <img id="previewImg" src="" alt="Image preview" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #d1d5db;" />
+            <div style="margin-top: 5px; font-size: 12px; color: #6b7280;">
+              <span id="imageName"></span> (<span id="imageSize"></span>)
+            </div>
+          </div>
+        </div>
+
+        <div id="messageField">
+          <label for="text">Message</label>
+          <textarea id="text" name="text" placeholder="Write your message..." required></textarea>
+        </div>
+
+        <div id="rsvpFields" style="display: none;">
+          <div id="customMessageWrap">
+            <label for="customMessage">Custom Message (optional)</label>
+            <textarea id="customMessage" name="customMessage" placeholder="Add a personal message for the invitation..." style="min-height: 100px;"></textarea>
+            <div class="help">This will be included in the RSVP invitation email.</div>
+          </div>
+          <div id="rsvpUrlWrap">
+            <label for="rsvpUrl">RSVP Form URL (optional)</label>
+            <input id="rsvpUrl" name="rsvpUrl" type="url" placeholder="http://localhost:5000/fill_up_attendees.html" />
+            <div class="help">Provide an RSVP form link for your invitation (used for all event types).</div>
+          </div>
+          <div id="derivedLinks" style="margin-top: 10px; font-size: 13px; color: #374151; display: none;">
+            <div style="margin-top: 6px;">
+              Attendees list for this recipient: 
+              <a id="listLink" href="#" target="_blank" style="color:#2563eb; text-decoration:underline;">open list</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="sendBtn" type="submit">Send Email</button>
+          <button id="resetBtn" class="secondary" type="button">Reset</button>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const form = document.getElementById('emailForm');
+      const sendBtn = document.getElementById('sendBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const statusEl = document.getElementById('status');
+          const toInput = document.getElementById('to');
+          const rsvpUrlInput = document.getElementById('rsvpUrl');
+          const listLink = document.getElementById('listLink');
+          const derivedLinks = document.getElementById('derivedLinks');
+          const imageAttachment = document.getElementById('imageAttachment');
+          const imagePreview = document.getElementById('imagePreview');
+          const previewImg = document.getElementById('previewImg');
+          const imageName = document.getElementById('imageName');
+          const imageSize = document.getElementById('imageSize');
+
+      function setStatus(message, type) {
+        statusEl.textContent = message || '';
+        statusEl.className = 'status' + (type ? ' ' + type : '');
+      }
+
+      function validate() {
+        const to = document.getElementById('to').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const emailType = document.getElementById('emailType').value;
+        
+        if (!to || !subject) {
+          setStatus('Please fill in To and Subject.', 'error');
+          return false;
+        }
+        
+        // Basic email check
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+          setStatus('Please enter a valid recipient email address.', 'error');
+          return false;
+        }
+        
+        // Require message for all types except RSVP
+        if (emailType !== 'rsvp') {
+          const text = document.getElementById('text').value.trim();
+          if (!text) {
+            setStatus('Please fill in the message.', 'error');
+            return false;
+          }
+        }
+        
+        // Validate image file if selected
+        const imageFile = imageAttachment.files[0];
+        if (imageFile) {
+          // Check file size (max 5MB)
+          const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+          if (imageFile.size > maxSize) {
+            setStatus('Image file is too large. Please select an image smaller than 5MB.', 'error');
+            return false;
+          }
+          
+          // Check file type
+          if (!imageFile.type.startsWith('image/')) {
+            setStatus('Please select a valid image file.', 'error');
+            return false;
+          }
+        }
+        
+        return true;
+      }
+
+      function updateDerivedLinks() {
+        const email = toInput.value.trim();
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const baseRsvp = 'http://localhost:5000/fill_up_attendees.html';
+        const baseList = 'http://localhost:5000/listofattendees.html';
+        if (isValid) {
+          // Default RSVP URL with recipient email as query parameter
+          if (rsvpUrlInput && (!rsvpUrlInput.value || rsvpUrlInput.value.startsWith(baseRsvp))) {
+            rsvpUrlInput.value = `${baseRsvp}?email=${encodeURIComponent(email)}`;
+          }
+          if (listLink && derivedLinks) {
+            listLink.href = `${baseList}?email=${encodeURIComponent(email)}`;
+            derivedLinks.style.display = 'block';
+          }
+        } else {
+          if (derivedLinks) derivedLinks.style.display = 'none';
+        }
+      }
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        setStatus('');
+        if (!validate()) return;
+
+        sendBtn.disabled = true;
+        setStatus('Sending...', '');
+
+        const emailType = document.getElementById('emailType').value;
+        const rsvpUrl = document.getElementById('rsvpUrl').value.trim();
+        const imageFile = imageAttachment.files[0];
+        let payload, endpoint;
+
+        // Prepare form data for file upload
+        const formData = new FormData();
+        formData.append('to', document.getElementById('to').value.trim());
+        formData.append('subject', document.getElementById('subject').value.trim());
+        formData.append('rsvpUrl', rsvpUrl);
+        
+        if (imageFile) {
+          formData.append('image', imageFile);
+        }
+
+        if (emailType === 'rsvp') {
+          // RSVP invitation payload
+          formData.append('customMessage', document.getElementById('customMessage').value.trim());
+          endpoint = 'http://localhost:2000/send-rsvp-invitation';
+        } else {
+          // Regular email payload
+          formData.append('text', document.getElementById('text').value.trim());
+          endpoint = 'http://localhost:2000/send-email';
+        }
+
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.success) {
+            const msg = (data && (data.message || data.error)) || response.statusText || 'Failed to send email.';
+            throw new Error(typeof msg === 'string' ? msg : 'Failed to send email.');
+          }
+
+          setStatus('Email sent successfully!', 'success');
+          form.reset();
+          // On RSVP, open the attendees list for this recipient automatically
+          if (emailType === 'rsvp') {
+            const to = toInput.value.trim();
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+              const listUrl = `http://localhost:5000/listofattendees.html?email=${encodeURIComponent(to)}`;
+              window.open(listUrl, '_blank');
+            }
+          }
+        } catch (err) {
+          setStatus(err.message || 'Failed to send email.', 'error');
+        } finally {
+          sendBtn.disabled = false;
+        }
+      });
+
+      resetBtn.addEventListener('click', function() {
+        form.reset();
+        setStatus('');
+        // Reset form visibility: show URL for all, custom message only for RSVP
+        document.getElementById('messageField').style.display = 'block';
+        document.getElementById('rsvpFields').style.display = 'block';
+        document.getElementById('customMessageWrap').style.display = 'none';
+        document.getElementById('rsvpUrlWrap').style.display = 'block';
+        // Hide image preview
+        imagePreview.style.display = 'none';
+      });
+
+      // Handle email type switching
+      document.getElementById('emailType').addEventListener('change', function() {
+        const emailType = this.value;
+        const messageField = document.getElementById('messageField');
+        const rsvpFields = document.getElementById('rsvpFields');
+        const customMessageWrap = document.getElementById('customMessageWrap');
+        const rsvpUrlWrap = document.getElementById('rsvpUrlWrap');
+        
+        if (emailType === 'rsvp') {
+          messageField.style.display = 'none';
+          rsvpFields.style.display = 'block';
+          customMessageWrap.style.display = 'block';
+          rsvpUrlWrap.style.display = 'block';
+          document.getElementById('subject').placeholder = 'Wedding RSVP Invitation';
+          updateDerivedLinks();
+        } else {
+          messageField.style.display = 'block';
+          rsvpFields.style.display = 'block';
+          customMessageWrap.style.display = 'none';
+          rsvpUrlWrap.style.display = 'block';
+          document.getElementById('subject').placeholder = 'Subject';
+          if (derivedLinks) derivedLinks.style.display = 'none';
+        }
+      });
+
+      // Initialize visibility on load
+      document.getElementById('emailType').dispatchEvent(new Event('change'));
+      // Handle image preview
+      imageAttachment.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+          // Validate file type
+          if (!file.type.startsWith('image/')) {
+            setStatus('Please select a valid image file.', 'error');
+            this.value = '';
+            return;
+          }
+          
+          // Validate file size (max 5MB)
+          const maxSize = 5 * 1024 * 1024;
+          if (file.size > maxSize) {
+            setStatus('Image file is too large. Please select an image smaller than 5MB.', 'error');
+            this.value = '';
+            return;
+          }
+          
+          // Show preview
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            imageName.textContent = file.name;
+            imageSize.textContent = formatFileSize(file.size);
+            imagePreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.style.display = 'none';
+        }
+      });
+
+      // Helper function to format file size
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      // Keep derived links in sync with recipient input
+      toInput.addEventListener('input', updateDerivedLinks);
+      // Initialize links once on load
+      updateDerivedLinks();
+    })();
+  </script>
+</body>
+</html>
+
+

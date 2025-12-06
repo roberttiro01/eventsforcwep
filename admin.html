@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CWEP Admin Login</title>
+  <link rel="stylesheet" href="css/index.css" />
+  <style>
+    body { background: #f5f7fb; }
+    .admin-login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #edf2ff 0%, #e6f0ff 100%);
+    }
+    .admin-card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      padding: 28px;
+    }
+    .admin-card-header { text-align: center; margin-bottom: 20px; }
+     .admin-badge {
+       width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 12px;
+       background: #1e3a8a; color: #fff; display: grid; place-items: center; font-weight: 800;
+       overflow: hidden;
+     }
+     
+     .logo-image {
+       width: 100%;
+       height: 100%;
+       object-fit: cover;
+       border-radius: 12px;
+     }
+    .admin-title { font-size: 22px; font-weight: 800; color: #1f2937; }
+    .admin-subtitle { font-size: 14px; color: #6b7280; margin-top: 6px; }
+    .admin-form { margin-top: 16px; display: grid; gap: 14px; }
+    .form-group label { display: block; font-size: 13px; color: #374151; margin-bottom: 6px; font-weight: 600; }
+    .form-control {
+      width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #e5e7eb; background: #f9fafb;
+      font-size: 14px; color: #111827; transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .form-control:focus { outline: none; border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212,175,55,0.12); background: #fff; }
+    .admin-actions { margin-top: 6px; display: flex; align-items: center; justify-content: space-between; }
+    .remember { display: flex; gap: 8px; align-items: center; font-size: 13px; color: #374151; }
+    .login-btn {
+      width: 100%; margin-top: 6px; padding: 12px 16px; border-radius: 999px; border: none; cursor: pointer;
+      background: #d4af37; color: #fff; font-weight: 800; letter-spacing: .3px; transition: transform .1s ease, background .2s ease;
+    }
+    .login-btn:hover { background: #b89728; }
+    .login-btn:active { transform: translateY(1px); }
+    .hint { margin-top: 12px; font-size: 12px; color: #6b7280; text-align: center; }
+    .error { display:none; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 10px 12px; border-radius: 10px; font-size: 13px; }
+    .footer-links { margin-top: 16px; font-size: 12px; text-align: center; color: #6b7280; }
+    .footer-links a { color: #1e3a8a; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="admin-login-wrapper">
+    <div class="admin-card">
+      <div class="admin-card-header">
+        <div class="admin-badge">
+          <img src="indeximages/me.jpg" alt="CWEP Logo" class="logo-image" />
+        </div>
+        <div class="admin-title">Admin Login</div>
+        <div class="admin-subtitle">Sign in to access the admin dashboard</div>
+      </div>
+      <div id="loginError" class="error">Invalid credentials. Please try again.</div>
+      <form id="adminLoginForm" class="admin-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" class="form-control" type="text" placeholder="Enter admin username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" class="form-control" type="password" placeholder="Enter password" required />
+        </div>
+        <div class="admin-actions">
+          <label class="remember"><input id="remember" type="checkbox" /> Remember me</label>
+        </div>
+        <button type="submit" class="login-btn">Sign In</button>
+      </form>
+      <div class="footer-links">Back to <a href="index.html">Home</a></div>
+    </div>
+  </div>
+  <script src="js/admin-auth.js"></script>
+</body>
+</html>

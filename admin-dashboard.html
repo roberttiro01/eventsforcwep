@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body { 
+      height: 100%; 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+      color: #2d3748;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 100vh;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+      transition: grid-template-columns 0.3s ease;
+    }
+
+    .layout.sidebar-collapsed {
+      grid-template-columns: 60px 1fr;
+    }
+
+
+    .sidebar {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 50%, #0f172a 100%);
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 5;
+      min-height: 100vh;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed {
+      width: 60px;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: #cbd5e1;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .user-profile {
+      background: transparent;
+      padding: 30px 15px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .sidebar.collapsed .user-profile {
+      padding: 20px 10px;
+    }
+
+    .sidebar.collapsed .profile-name {
+      display: none;
+    }
+
+
+    .profile-picture {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      margin: 0 auto 12px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+      position: relative;
+      z-index: 1;
+      background-size: cover !important;
+      background-position: center center !important;
+      background-repeat: no-repeat;
+    }
+
+    /* Hover overlay to hint edit */
+    .profile-picture::after {
+      content: 'Edit';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .user-profile:hover .profile-picture::after { opacity: 1; }
+    .user-profile:hover .profile-name { text-decoration: underline; }
+
+    /* Avatar shape variants */
+    .avatar-shape-circle { border-radius: 50% !important; clip-path: none; }
+    .avatar-shape-rounded { border-radius: 14px !important; clip-path: none; }
+    .avatar-shape-square { border-radius: 0 !important; clip-path: none; }
+    .avatar-shape-diamond { border-radius: 0 !important; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+    .avatar-shape-hex { border-radius: 0 !important; clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%); }
+
+    /* Remove circular border when using clipped shapes to avoid visible corners */
+    .avatar-shape-diamond, .avatar-shape-hex { border: 0 !important; }
+
+    .profile-name {
+      color: #cbd5e1;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Edit Profile Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+      border-radius: 18px; padding: 26px; width: 92%; max-width: 560px;
+      box-shadow: 0 24px 60px rgba(2,6,23,0.25);
+      border: 1px solid rgba(226,232,240,0.8);
+      backdrop-filter: blur(8px);
+      position: relative;
+      animation: modalIn .16s ease-out both;
+    }
+    .modal h3 { margin: 0; color: #0f172a; font-size: 20px; font-weight: 800; }
+    .modal .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .modal .sub { color: #64748b; font-size: 12px; font-weight: 600; }
+    .modal .divider { height: 1px; background: rgba(226,232,240,0.8); margin: 10px 0 14px 0; }
+    .modal .close {
+      border: 0; background: transparent; cursor: pointer; color: #334155; width: 36px; height: 36px; border-radius: 10px;
+      display:flex; align-items:center; justify-content:center; font-size: 18px; font-weight: 800;
+    }
+    .modal .close:hover { background: rgba(226,232,240,0.6); }
+    .modal .row { display: grid; gap: 10px; margin: 12px 0; }
+    .modal label { font-size: 12px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+    .modal input[type="text"], .modal input[type="file"], .modal select {
+      padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(226,232,240,0.9);
+      background: rgba(248,250,252,0.95); outline: none; color:#0f172a;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .06s ease;
+      box-shadow: 0 8px 24px rgba(2,6,23,0.06) inset;
+    }
+    .modal input[type="text"]:focus, .modal select:focus { box-shadow: 0 0 0 4px rgba(79,70,229,0.15); border-color:#4f46e5; }
+    .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+    .btn { padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(226,232,240,0.9); background: linear-gradient(180deg,#f8fafc,#eef2f7); cursor: pointer; font-weight: 800; color:#0f172a; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(135deg,#4f46e5,#7c3aed); color: #fff; border: none; box-shadow: 0 12px 26px rgba(79,70,229,0.35); }
+    .btn.primary:hover { filter: brightness(1.05); }
+    .color-row { display:flex; align-items:center; gap:10px; }
+    .color-row input[type="color"]{ width:48px; height:38px; padding:0; border:1px solid rgba(226,232,240,0.9); border-radius: 10px; background:#fff; }
+
+    @keyframes modalIn { from { opacity: 0; transform: translateY(4px) scale(0.98);} to { opacity: 1; transform: translateY(0) scale(1);} }
+
+
+    .logout-btn {
+      background: transparent;
+      color: #cbd5e1;
+      border: 2px solid transparent;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(8px);
+    }
+
+    .logout-btn:active {
+      transform: translateY(0);
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+      flex: 1;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .nav a {
+      padding: 16px 12px;
+      margin: 4px 6px;
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .nav a span {
+      display: none;
+    }
+
+    .nav a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      margin: 4px 8px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav a span {
+      transition: all 0.3s ease;
+    }
+
+    .nav a::before {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      flex-shrink: 0;
+    }
+
+    .nav a[href="#"]::before,
+    .nav a[href="#overview"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/></svg>');
+    }
+
+    .nav a[href="pending-clients.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>');
+    }
+
+    .nav a[href="event_this_month.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>');
+    }
+
+    .nav a[href="account-settings.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>');
+    }
+
+    .nav a[href="messages.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>');
+    }
+    /* Feedback link icon */
+    .nav a[href="feedbacks.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>');
+    }
+
+    .nav a[href="#"]:nth-of-type(6)::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm2 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>');
+    }
+
+    .nav a[href="listofattendees.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>');
+    }
+
+    .nav a[href="#update-pages"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>');
+    }
+
+    /* Manage Packages icon */
+    .nav a[href="#manage-packages"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>');
+    }
+
+    .nav a[href="mailer.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>');
+    }
+
+    /* Delete History icon */
+    .nav a[href="delete-history.html"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path d="M6 8h8v10H6z"/><path d="M5 6h10v2H5z"/><path d="M8 2h4v2H8z"/></svg>');
+    }
+
+    /* Transactions icon */
+    .nav a[href="#transactions"]::before {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="%23cbd5e1" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>');
+    }
+
+
+    .nav a:hover { 
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(8px);
+    }
+    
+    .nav a:active { 
+      transform: translateX(4px) scale(0.98);
+    }
+    
+    .nav a:focus-visible { 
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5);
+    }
+
+    .nav a.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      transform: translateX(8px);
+    }
+
+    .spacer { 
+      flex: 1 1 auto; 
+    }
+
+    .logout-section {
+      padding: 15px;
+      margin-top: auto;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .logout-section {
+      padding: 10px;
+    }
+
+    .sidebar.collapsed .logout-btn {
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    main {
+      background: rgba(248, 250, 252, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px;
+      overflow: auto;
+      min-height: 100vh;
+    }
+
+    /* Card container style for embedded pages */
+    main > div {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(20px);
+    }
+
+    /* Overview stats */
+    .overview {
+      display: grid;
+      gap: 24px;
+      width: min(1200px, 100%);
+      padding: 32px;
+    }
+
+    .overview-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 20px 0;
+    }
+
+    .overview-title {
+      font-size: 36px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .overview-subtitle {
+      font-size: 16px;
+      color: #64748b;
+      margin: 0;
+      font-weight: 500;
+    }
+    
+    .overview .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .overview .stat {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      display: grid;
+      gap: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .overview .stat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    }
+
+    .overview .stat:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .overview .stat .label { 
+      color: #475569; 
+      font-size: 13px; 
+      font-weight: 600;
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+    }
+    
+    .overview .stat .value { 
+      font-size: 36px; 
+      font-weight: 800; 
+      color: #0f172a;
+      line-height: 1;
+    }
+    
+    .overview .stat .hint { 
+      color: #475569; 
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .overview .stat.alert {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2), 0 8px 25px rgba(239, 68, 68, 0.15);
+    }
+    
+    .overview .stat .alert-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ef4444, #dc2626);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+      animation: pulse 2s infinite;
+    }
+    
+    .overview .stat.success {
+      border-color: #10b981;
+      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2), 0 8px 25px rgba(16, 185, 129, 0.15);
+    }
+    
+    .overview .stat .success-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #10b981, #059669);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    
+    .overview .stat.info {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2), 0 8px 25px rgba(59, 130, 246, 0.15);
+    }
+    
+    .overview .stat .info-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #3b82f6, #2563eb);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    
+    .overview .panel {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Quick Links Styling */
+    .overview .panel a {
+      text-decoration: none;
+      padding: 12px 20px;
+      border: 2px solid rgba(79, 70, 229, 0.2);
+      border-radius: 12px;
+      color: #4f46e5;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .overview .panel a:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Message item hover effects */
+    .message-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Button hover effects */
+    .delete-message:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .post-to-testimonials-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    #mark-read:hover, #refresh-messages:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Activity Chart Mobile Styles */
+    @media (max-width: 768px) {
+      .activity-chart .chart-container {
+        height: 200px !important;
+        padding: 15px !important;
+        gap: 20px !important;
+      }
+      
+      .activity-chart .y-axis {
+        margin-right: 10px !important;
+        font-size: 10px !important;
+      }
+      
+      .activity-chart .bars-container {
+        gap: 12px !important;
+      }
+      
+      .activity-chart .chart-bar {
+        max-width: 45px !important;
+      }
+      
+      .activity-chart .bar {
+        width: 28px !important;
+      }
+      
+      .activity-chart .chart-bar span {
+        font-size: 9px !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .activity-chart .chart-container {
+        height: 180px !important;
+        padding: 12px !important;
+        gap: 15px !important;
+      }
+      
+      .activity-chart .y-axis {
+        margin-right: 8px !important;
+        font-size: 9px !important;
+      }
+      
+      .activity-chart .bars-container {
+        gap: 8px !important;
+      }
+      
+      .activity-chart .chart-bar {
+        max-width: 35px !important;
+      }
+      
+      .activity-chart .bar {
+        width: 22px !important;
+      }
+      
+      .activity-chart .chart-bar span {
+        font-size: 8px !important;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .activity-chart .chart-container {
+        height: 160px !important;
+        padding: 10px !important;
+        gap: 12px !important;
+      }
+      
+      .activity-chart .y-axis {
+        margin-right: 6px !important;
+        font-size: 8px !important;
+      }
+      
+      .activity-chart .bars-container {
+        gap: 6px !important;
+      }
+      
+      .activity-chart .chart-bar {
+        max-width: 30px !important;
+      }
+      
+      .activity-chart .bar {
+        width: 18px !important;
+      }
+      
+      .activity-chart .chart-bar span {
+        font-size: 7px !important;
+      }
+    }
+
+    /* Mobile-specific styles for better touch interaction */
+    @media (max-width: 768px) {
+      .message-item:hover {
+        transform: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      
+      .delete-message:hover,
+      .post-to-testimonials-btn:hover,
+      #mark-read:hover,
+      #refresh-messages:hover {
+        transform: none;
+      }
+      
+      .delete-message:active,
+      .post-to-testimonials-btn:active,
+      #mark-read:active,
+      #refresh-messages:active {
+        transform: scale(0.95);
+      }
+      
+      /* Activity chart touch interactions */
+      .activity-chart .bar:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+      
+      .activity-chart .bar:active {
+        transform: scale(0.95) !important;
+      }
+    }
+
+    /* Large screens and tablets */
+    @media (max-width: 1200px) {
+      .layout { grid-template-columns: 240px 1fr; }
+      .overview .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* Large phones and small tablets */
+    @media (max-width: 1024px) and (min-width: 897px) {
+      .layout { 
+        grid-template-columns: 200px 1fr; 
+      }
+      
+      .sidebar {
+        padding: 14px;
+      }
+      
+      .nav a {
+        padding: 12px 14px;
+        font-size: 13px;
+      }
+      
+      .overview .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+      
+      .overview .stat {
+        padding: 20px;
+      }
+      
+      .overview .stat .value {
+        font-size: 32px;
+      }
+      
+      /* Activity chart for large phones */
+      .activity-chart .chart-container {
+        height: 250px;
+        gap: 25px;
+      }
+      
+      .activity-chart .bars-container {
+        gap: 20px;
+      }
+      
+      .activity-chart .chart-bar {
+        max-width: 60px;
+      }
+      
+      .activity-chart .bar {
+        width: 35px;
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 200px 1fr; }
+      .overview .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Ultra-wide phones (like Galaxy Note, iPhone 14 Pro Max) */
+    @media (max-width: 896px) and (min-width: 769px) {
+      .layout { 
+        grid-template-columns: 180px 1fr; 
+      }
+      
+      .sidebar {
+        padding: 12px;
+      }
+      
+      .nav a {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      
+      .overview .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      
+      .overview .stat {
+        padding: 18px;
+      }
+      
+      .overview .stat .value {
+        font-size: 30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .layout { 
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+      
+      .sidebar {
+        order: 1;
+        min-height: auto;
+        padding: 16px;
+        position: relative;
+      }
+      
+      .sidebar-toggle {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 100;
+      }
+      
+      .user-profile {
+        padding: 20px 15px 15px;
+        text-align: center;
+      }
+      
+      .profile-picture {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+      }
+      
+      .profile-name {
+        font-size: 16px;
+        margin: 8px 0;
+      }
+      
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 16px 0;
+      }
+      
+      .nav a {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        padding: 12px 8px;
+        font-size: 12px;
+        margin: 2px;
+      }
+      
+      .nav a span {
+        display: block;
+        margin-top: 4px;
+      }
+      
+      .logout-section {
+        padding: 10px;
+        margin-top: 16px;
+      }
+      
+      .logout-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+      
+      main {
+        padding: 16px;
+        order: 2;
+      }
+      
+      .overview {
+        padding: 20px;
+      }
+      
+      .overview-title {
+        font-size: 28px;
+      }
+      
+      .overview .stats {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .overview .stat {
+        padding: 20px;
+      }
+      
+      .overview .stat .value {
+        font-size: 28px;
+      }
+      
+      /* Messages section responsive */
+      .panel {
+        padding: 16px;
+      }
+      
+      .message-item {
+        padding: 16px !important;
+        margin-bottom: 12px !important;
+      }
+      
+      .message-item img {
+        max-width: 200px !important;
+        max-height: 150px !important;
+      }
+      
+      /* Button responsive styles */
+      .delete-message,
+      .post-to-testimonials-btn,
+      #mark-read,
+      #refresh-messages {
+        padding: 10px 16px !important;
+        font-size: 12px !important;
+        margin-top: 8px !important;
+      }
+    }
+
+    /* Standard smartphones (iPhone 13, Galaxy S series) */
+    @media (max-width: 480px) {
+      .layout {
+        grid-template-rows: auto 1fr;
+      }
+      
+      .sidebar {
+        padding: 12px;
+      }
+      
+      /* Increase touch targets for better usability */
+      .nav a {
+        min-height: 44px; /* Apple's recommended minimum touch target */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 8px;
+      }
+      
+      .logout-btn {
+        min-height: 44px;
+        padding: 12px 16px;
+      }
+      
+      .sidebar-toggle {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+      }
+      
+      /* Overview panel mobile optimization */
+      .overview-header {
+        padding: 15px 0;
+      }
+      
+      .overview-title {
+        font-size: 22px;
+        letter-spacing: 0.5px;
+      }
+      
+      .overview-subtitle {
+        font-size: 14px;
+      }
+      
+      .user-profile {
+        padding: 15px 10px 10px;
+      }
+      
+      .profile-picture {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+      }
+      
+      .profile-name {
+        font-size: 14px;
+        margin: 6px 0;
+      }
+      
+      .nav {
+        padding: 12px 0;
+        gap: 6px;
+      }
+      
+      .nav a {
+        min-width: 100px;
+        padding: 10px 6px;
+        font-size: 11px;
+        margin: 1px;
+      }
+      
+      .nav a::before {
+        width: 16px;
+        height: 16px;
+      }
+      
+      .logout-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+      }
+      
+      main {
+        padding: 12px;
+      }
+      
+      .overview {
+        padding: 16px;
+      }
+      
+      .overview-title {
+        font-size: 24px;
+      }
+      
+      .overview .stats {
+        gap: 12px;
+      }
+      
+      .overview .stat {
+        padding: 16px;
+      }
+      
+      .overview .stat .value {
+        font-size: 24px;
+      }
+      
+      .overview .stat .label {
+        font-size: 12px;
+      }
+      
+      .overview .stat .hint {
+        font-size: 13px;
+      }
+      
+      /* Messages section for small phones */
+      .panel {
+        padding: 12px;
+      }
+      
+      .message-item {
+        padding: 12px !important;
+        margin-bottom: 8px !important;
+      }
+      
+      .message-item img {
+        max-width: 150px !important;
+        max-height: 120px !important;
+      }
+      
+      /* Button styles for small phones */
+      .delete-message,
+      .post-to-testimonials-btn,
+      #mark-read,
+      #refresh-messages {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+        margin-top: 6px !important;
+      }
+    }
+
+    /* Compact phones (iPhone SE, small Android phones) */
+    @media (max-width: 360px) {
+      .sidebar {
+        padding: 8px;
+      }
+      
+      .user-profile {
+        padding: 12px 8px 8px;
+      }
+      
+      /* Ensure touch targets remain accessible */
+      .nav a {
+        min-height: 42px;
+        padding: 10px 6px;
+        margin: 2px 1px;
+      }
+      
+      .logout-btn {
+        min-height: 42px;
+        padding: 10px 12px;
+      }
+      
+      .sidebar-toggle {
+        width: 42px;
+        height: 42px;
+        font-size: 14px;
+      }
+      
+      /* Optimize stats grid for very small screens */
+      .overview .stat {
+        padding: 14px;
+        margin-bottom: 8px;
+      }
+      
+      .overview .stat .value {
+        font-size: 20px;
+        line-height: 1.1;
+      }
+      
+      .overview .stat .label {
+        font-size: 10px;
+        line-height: 1.2;
+      }
+      
+      .overview .stat .hint {
+        font-size: 11px;
+        line-height: 1.2;
+      }
+      
+      .profile-picture {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      
+      .profile-name {
+        font-size: 13px;
+        margin: 4px 0;
+      }
+      
+      .nav {
+        padding: 8px 0;
+        gap: 4px;
+      }
+      
+      .nav a {
+        min-width: 90px;
+        padding: 8px 4px;
+        font-size: 10px;
+      }
+      
+      .nav a::before {
+        width: 14px;
+        height: 14px;
+      }
+      
+      .logout-btn {
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+      
+      main {
+        padding: 8px;
+      }
+      
+      .overview {
+        padding: 12px;
+      }
+      
+      .overview-title {
+        font-size: 20px;
+      }
+      
+      .overview .stats {
+        gap: 8px;
+      }
+      
+      .overview .stat {
+        padding: 12px;
+      }
+      
+      .overview .stat .value {
+        font-size: 20px;
+      }
+      
+      .overview .stat .label {
+        font-size: 11px;
+      }
+      
+      .overview .stat .hint {
+        font-size: 12px;
+      }
+      
+      /* Messages section for very small phones */
+      .panel {
+        padding: 8px;
+      }
+      
+      .message-item {
+        padding: 8px !important;
+        margin-bottom: 6px !important;
+      }
+      
+      .message-item img {
+        max-width: 120px !important;
+        max-height: 100px !important;
+      }
+      
+      /* Button styles for very small phones */
+      .delete-message,
+      .post-to-testimonials-btn,
+      #mark-read,
+      #refresh-messages {
+        padding: 6px 10px !important;
+        font-size: 10px !important;
+        margin-top: 4px !important;
+      }
+    }
+  </style>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="layout">
+
+    <aside class="sidebar" id="sidebar">
+      <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+      <div class="user-profile">
+        <div class="profile-picture" style="background-image: url('indeximages/me.jpg');"></div>
+        <h3 class="profile-name">Edit profile</h3>
+      </div>
+      <nav class="nav">
+        <a href="#overview" id="overview-link"><span>Overview</span></a>
+        <a href="pending-clients.html"><span>Pending Clients</span></a>
+        <a href="#transactions" id="transactions-link"><span>Transactions</span></a>
+        <a href="event_this_month.html"><span>Event This Month</span></a>
+        <a href="feedbacks.html" id="messages-link"><span>Feedbacks</span></a>
+        <a href="#update-pages" id="update-pages-link"><span>Update Pages</span></a>
+        <a href="#manage-packages" id="manage-packages-link"><span>Manage Packages</span></a>
+        <a href="delete-history.html" id="delete-history-link"><span>Delete History</span></a>
+        <a href="account-settings.html" id="account-settings"><span>Account Settings</span></a>
+        <a href="listofattendees.html" id="list-attendees-link"><span>List Attendees</span></a>
+        <a href="mailer.html" id="mailer-link"><span>Send E-Mail</span></a>
+      </nav>
+      <div class="logout-section">
+        <button class="logout-btn" id="logout-btn">Log Out</button>
+      </div>
+    </aside>
+
+    <main></main>
+    <!-- Edit Profile Modal -->
+    <div class="modal-backdrop" id="editProfileBackdrop">
+      <div class="modal">
+        <div class="header">
+          <div>
+            <h3>Edit profile</h3>
+            <div class="sub">Personalize your dashboard look and feel</div>
+          </div>
+          <button class="close" id="editProfileX" title="Close">×</button>
+        </div>
+        <div class="divider"></div>
+        <div class="row">
+          <label for="editProfileName">Display name</label>
+          <input id="editProfileName" type="text" placeholder="Enter name" />
+        </div>
+        <div class="row">
+          <label for="editProfileAvatarUrl">Avatar URL</label>
+          <input id="editProfileAvatarUrl" type="text" placeholder="https://example.com/avatar.jpg" />
+        </div>
+        <div class="row">
+          <label for="editProfileAvatarFile">Or upload avatar</label>
+          <input id="editProfileAvatarFile" type="file" accept="image/*" />
+        </div>
+        <div class="row">
+          <label for="editProfileShape">Avatar shape</label>
+          <select id="editProfileShape">
+            <option value="circle">Circle</option>
+            <option value="rounded">Rounded</option>
+            <option value="square">Square</option>
+            <option value="diamond">Diamond</option>
+            <option value="hex">Hexagon</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="sidebarBgColor">Sidebar BG color</label>
+          <div class="color-row">
+            <input id="sidebarBgColor" type="color" value="#1e293b" />
+            <input id="sidebarBgColorText" type="text" placeholder="#1e293b or linear-gradient(...)" style="flex:1;" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="editProfileCancel">Cancel</button>
+          <button class="btn primary" id="editProfileSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // SweetAlert2 helpers (shared)
+    function notifyProfileSuccess(message){
+      if (window.Swal && Swal.fire) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Profile updated',
+          text: String(message || 'Your profile has been saved.'),
+          showConfirmButton: false,
+          timer: 1400,
+          timerProgressBar: true,
+          position: 'center'
+        });
+      } else {
+        alert(String(message || 'Profile updated successfully.'));
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auth guard: redirect to login if no valid token
+      try {
+        const token = localStorage.getItem('adminToken');
+        const expiry = parseInt(localStorage.getItem('adminTokenExpiry') || '0', 10);
+        const now = Date.now();
+        if (!token || !expiry || now >= expiry) {
+          window.location.href = 'admin.html';
+          return;
+        }
+      } catch (_) {}
+
+      const content = document.querySelector('main');
+      const nav = document.querySelector('.nav');
+      const sidebar = document.querySelector('#sidebar');
+      const layout = document.querySelector('.layout');
+      const sidebarToggle = document.querySelector('#sidebar-toggle');
+      const overviewLink = document.querySelector('#overview-link');
+      const pendingLink = document.querySelector('.nav a[href="pending-clients.html"]');
+      const eventMonthLink = document.querySelector('.nav a[href="event_this_month.html"]');
+      const accountSettingsLink = document.querySelector('#account-settings');
+      const messagesLink = document.querySelector('#messages-link');
+      const logoutBtn = document.querySelector('#logout-btn');
+      const updatePagesLink = document.querySelector('#update-pages-link');
+      const managePackagesLink = document.querySelector('#manage-packages-link');
+      const deleteHistoryLink = document.querySelector('#delete-history-link');
+      const listAttendeesLink = document.querySelector('#list-attendees-link');
+      const mailerLink = document.querySelector('#mailer-link');
+      const transactionsLink = document.querySelector('#transactions-link');
+      const profileArea = document.querySelector('.user-profile');
+      const profilePic = document.querySelector('.profile-picture');
+      const profileName = document.querySelector('.profile-name');
+      const modalBackdrop = document.querySelector('#editProfileBackdrop');
+      const editNameInput = document.querySelector('#editProfileName');
+      const editAvatarUrlInput = document.querySelector('#editProfileAvatarUrl');
+      const editAvatarFileInput = document.querySelector('#editProfileAvatarFile');
+      const editCancelBtn = document.querySelector('#editProfileCancel');
+      const editSaveBtn = document.querySelector('#editProfileSave');
+      const editShapeSelect = document.querySelector('#editProfileShape');
+      const sidebarBgColor = document.querySelector('#sidebarBgColor');
+      const sidebarBgColorText = document.querySelector('#sidebarBgColorText');
+      const editCloseX = document.querySelector('#editProfileX');
+
+      // Simple hash router so URL reflects current section (works on file://)
+      function routeByHash() {
+        const h = (location.hash || '#overview').toLowerCase();
+        switch (h) {
+          case '#overview':
+            loadOverviewIntoContent();
+            break;
+          case '#pending':
+            loadPendingClientsIntoContent();
+            break;
+          case '#event-this-month':
+            loadEventThisMonthIntoContent();
+            break;
+          case '#account-settings':
+            loadResetPasswordIntoContent();
+            break;
+          case '#feedbacks':
+            loadFeedbackIntoContent();
+            break;
+          case '#list-attendees':
+            loadListAttendeesIntoContent();
+            break;
+          case '#update-pages':
+            loadUpdatePagesIntoContent();
+            break;
+          case '#manage-packages':
+            loadManagePackagesIntoContent();
+            break;
+          case '#mailer':
+            loadMailerIntoContent();
+            break;
+          case '#delete-history':
+            loadDeleteHistoryIntoContent();
+            break;
+          case '#transactions':
+            loadTransactionsIntoContent();
+            break;
+          default:
+            loadOverviewIntoContent();
+        }
+
+        // Active link highlighting using known elements
+        if (nav) {
+          nav.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+          const hashToEl = {
+            '#overview': overviewLink,
+            '#pending': pendingLink,
+            '#event-this-month': eventMonthLink,
+            '#account-settings': accountSettingsLink,
+            '#feedbacks': messagesLink,
+            '#list-attendees': listAttendeesLink,
+            '#update-pages': updatePagesLink,
+            '#manage-packages': managePackagesLink,
+            '#mailer': mailerLink,
+            '#delete-history': deleteHistoryLink,
+            '#transactions': transactionsLink
+          };
+          const el = hashToEl[h] || overviewLink;
+          if (el) el.classList.add('active');
+        }
+
+        try { localStorage.setItem('adminLastNav', location.hash || '#overview'); } catch (_) {}
+      }
+
+      // Sidebar toggle functionality
+      if (sidebarToggle && sidebar && layout) {
+        sidebarToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('collapsed');
+          layout.classList.toggle('sidebar-collapsed');
+          
+          // Update toggle button text
+          if (sidebar.classList.contains('collapsed')) {
+            sidebarToggle.textContent = '→';
+          } else {
+            sidebarToggle.textContent = '☰';
+          }
+        });
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+          try {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminTokenExpiry');
+            localStorage.removeItem('adminUsername');
+            localStorage.removeItem('rememberMe');
+          } catch (_) {}
+          window.location.href = 'admin.html';
+        });
+      }
+
+      function parseYmdFlexible(input) {
+        if (!input) return null;
+        const s = String(input).trim();
+        const mIso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+        if (mIso) { return new Date(parseInt(mIso[1],10), parseInt(mIso[2],10)-1, parseInt(mIso[3],10)); }
+        const mUs = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (mUs) { return new Date(parseInt(mUs[3],10), parseInt(mUs[1],10)-1, parseInt(mUs[2],10)); }
+        const d = new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+      }
+
+      // Profile persistence helpers
+      function loadProfile() {
+        try {
+          const name = localStorage.getItem('adminProfileName');
+          const avatar = localStorage.getItem('adminProfileAvatar');
+          const shape = localStorage.getItem('adminProfileShape') || 'circle';
+          const sidebarBg = localStorage.getItem('adminSidebarBg');
+          if (profileName && name) profileName.textContent = name;
+          if (profilePic) {
+            if (avatar && avatar.trim()) {
+              profilePic.style.backgroundImage = `url('${avatar}')`;
+            } else {
+              profilePic.style.backgroundImage = "url('indeximages/me.jpg')";
+            }
+            applyAvatarShape(shape);
+          }
+          if (sidebar && sidebarBg && sidebarBg.trim()) {
+            sidebar.style.background = sidebarBg;
+          }
+        } catch (_) {}
+      }
+
+      function openEditProfile() {
+        if (!modalBackdrop) return;
+        // Pre-fill
+        editNameInput && (editNameInput.value = (profileName && profileName.textContent) || '');
+        const currentBg = (profilePic && profilePic.style && profilePic.style.backgroundImage) || '';
+        const m = currentBg.match(/url\(["']?(.*?)["']?\)/);
+        editAvatarUrlInput && (editAvatarUrlInput.value = (m && m[1]) && !m[1].includes('data:') ? m[1] : '');
+        editAvatarFileInput && (editAvatarFileInput.value = '');
+        if (editShapeSelect) {
+          try { editShapeSelect.value = localStorage.getItem('adminProfileShape') || 'circle'; } catch (_) { editShapeSelect.value = 'circle'; }
+        }
+        if (sidebarBgColor && sidebarBgColorText) {
+          const cur = (sidebar && getComputedStyle(sidebar).backgroundImage !== 'none') ? getComputedStyle(sidebar).backgroundImage : getComputedStyle(sidebar).background;
+          const saved = localStorage.getItem('adminSidebarBg');
+          const value = saved || cur || '#1e293b';
+          if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) sidebarBgColor.value = value; else sidebarBgColor.value = '#1e293b';
+          sidebarBgColorText.value = value;
+        }
+        modalBackdrop.style.display = 'flex';
+      }
+
+      function closeEditProfile() {
+        if (modalBackdrop) modalBackdrop.style.display = 'none';
+      }
+
+      function applyAvatarShape(shape) {
+        if (!profilePic) return;
+        const shapes = ['circle','rounded','square','diamond','hex'];
+        shapes.forEach(s => profilePic.classList.remove('avatar-shape-' + s));
+        profilePic.classList.add('avatar-shape-' + (shape || 'circle'));
+      }
+
+      function applySidebarBackground(value) {
+        if (!sidebar || !value) return;
+        // Clear any background-image to avoid it taking precedence
+        sidebar.style.backgroundImage = 'none';
+        sidebar.style.background = value;
+      }
+
+      // Convert uploaded image to data URL for persistence
+      function readFileAsDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ''));
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Wire profile area click -> open modal
+      if (profileArea) {
+        profileArea.addEventListener('click', openEditProfile);
+      }
+      if (editCancelBtn) editCancelBtn.addEventListener('click', closeEditProfile);
+      if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', function(e){
+          if (e.target === modalBackdrop) closeEditProfile();
+        });
+      }
+      if (editCloseX) editCloseX.addEventListener('click', closeEditProfile);
+      if (editSaveBtn) {
+        editSaveBtn.addEventListener('click', async function(){
+          try {
+            const newName = (editNameInput && editNameInput.value || '').trim();
+            let avatar = (editAvatarUrlInput && editAvatarUrlInput.value || '').trim();
+            const f = editAvatarFileInput && editAvatarFileInput.files && editAvatarFileInput.files[0];
+            if (f && f.type && f.type.startsWith('image/')) {
+              avatar = await readFileAsDataUrl(f);
+            }
+            const shape = (editShapeSelect && editShapeSelect.value) || 'circle';
+            // Sidebar background from picker/text
+            let newSidebarBg = '';
+            if (sidebarBgColorText && sidebarBgColorText.value.trim()) newSidebarBg = sidebarBgColorText.value.trim();
+            else if (sidebarBgColor && sidebarBgColor.value) newSidebarBg = sidebarBgColor.value;
+            if (newName && profileName) profileName.textContent = newName;
+            if (profilePic) {
+              if (avatar) profilePic.style.backgroundImage = `url('${avatar}')`;
+              applyAvatarShape(shape);
+            }
+            if (newSidebarBg) applySidebarBackground(newSidebarBg);
+            try {
+              if (newName) localStorage.setItem('adminProfileName', newName);
+              if (avatar) localStorage.setItem('adminProfileAvatar', avatar);
+              localStorage.setItem('adminProfileShape', shape);
+              if (newSidebarBg) localStorage.setItem('adminSidebarBg', newSidebarBg);
+            } catch (_) {}
+            // Show SweetAlert2 success after saving
+            notifyProfileSuccess('Your admin profile has been updated.');
+          } finally {
+            closeEditProfile();
+          }
+        });
+      }
+
+      // Live preview: color inputs
+      if (sidebarBgColor) {
+        sidebarBgColor.addEventListener('input', function(){
+          const val = sidebarBgColor.value;
+          if (sidebarBgColorText) sidebarBgColorText.value = val;
+          applySidebarBackground(val);
+          try { localStorage.setItem('adminSidebarBg', val); } catch (_) {}
+        });
+      }
+      if (sidebarBgColorText) {
+        sidebarBgColorText.addEventListener('input', function(){
+          const val = sidebarBgColorText.value.trim();
+          if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(val) && sidebarBgColor) sidebarBgColor.value = val;
+          applySidebarBackground(val);
+          try { if (val) localStorage.setItem('adminSidebarBg', val); } catch (_) {}
+        });
+      }
+
+      // Initial profile load
+      loadProfile();
+
+      function loadOverviewIntoContent() {
+        content.innerHTML = '';
+        const wrap = document.createElement('div');
+        wrap.className = 'overview';
+        wrap.innerHTML = `
+          <div class="overview-header">
+            <h1 class="overview-title">ADMIN DASHBOARD</h1>
+          </div>
+          <div class="stats">
+            <div class="stat" id="stat-pending-card">
+              <div class="label">Pending <span class="alert-dot" id="stat-pending-dot" style="display:none;"></span></div>
+              <div class="value" id="stat-pending">-</div>
+              <div class="hint">Awaiting action</div>
+            </div>
+            <div class="stat" id="stat-accepted-card">
+              <div class="label">Accepted Bookings <span class="success-dot" id="stat-accepted-dot" style="display:none;"></span></div>
+              <div class="value" id="stat-events">-</div>
+              <div class="hint">All-time accepted</div>
+            </div>
+            <div class="stat" id="stat-messages-card">
+              <div class="label">Feedback <span class="info-dot" id="stat-messages-dot" style="display:none;"></span></div>
+              <div class="value" id="stat-messages">-</div>
+              <div class="hint">New feedback</div>
+            </div>
+            <div class="stat" id="stat-this-month-card">
+              <div class="label">Events This Month <span class="info-dot" id="stat-this-month-dot" style="display:none;"></span></div>
+              <div class="value" id="stat-this-month">-</div>
+              <div class="hint">Current month events</div>
+            </div>
+            <div class="stat" id="stat-emails-card">
+              <div class="label">Send Emails <span class="info-dot" id="stat-emails-dot" style="display:none;"></span></div>
+              <div class="value" id="stat-emails">-</div>
+              <div class="hint">Email campaigns</div>
+            </div>
+          </div>
+          
+          <!-- Activity Chart Section -->
+          <div class="panel" style="margin-top: 32px;">
+            <div style="margin-bottom: 24px;">
+              <h3 style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0 0 8px 0;">Activity</h3>
+              <p style="color: #64748b; margin: 0; font-size: 14px;">Package booking activity overview</p>
+            </div>
+            <div class="activity-chart" id="activity-chart">
+              <!-- Legend -->
+              <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:12px; height:12px; background:#f59e0b; border-radius:2px;"></span>
+                  <span style="color:#475569; font-size:12px; font-weight:600;">Bookings</span>
+                </div>
+              </div>
+              <div class="chart-container" style="display: flex; align-items: end; gap: 40px; height: 360px; padding: 20px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85)); border-radius: 16px; position: relative; background-image: repeating-linear-gradient(to top, rgba(15,23,42,0.08) 0 1px, transparent 1px 60px);">
+                <!-- Y-axis labels -->
+                <div class="y-axis" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; margin-right: 20px; font-size: 12px; color: #64748b; font-weight: 500;">
+                  <span>400</span>
+                  <span>300</span>
+                  <span>200</span>
+                  <span>100</span>
+                  <span>0</span>
+                </div>
+                
+                <!-- Chart bars container -->
+                <div class="bars-container" style="display: flex; align-items: end; gap: 30px; height: 100%; flex: 1;">
+                  <!-- Bars will be dynamically generated here -->
+                </div>
+              </div>
+              
+              <!-- Loading state -->
+              <div class="chart-loading" style="text-align: center; padding: 60px; color: #64748b; font-size: 16px; display: none;">
+                Loading activity data...
+              </div>
+              
+              <!-- Error state -->
+              <div class="chart-error" style="text-align: center; padding: 60px; color: #dc2626; font-size: 16px; display: none;">
+                Error loading activity data
+              </div>
+            </div>
+          </div>
+        `;
+        content.appendChild(wrap);
+
+        const pendingEl = wrap.querySelector('#stat-pending');
+        const eventsEl = wrap.querySelector('#stat-events');
+        const messagesEl = wrap.querySelector('#stat-messages');
+        const thisMonthEl = wrap.querySelector('#stat-this-month');
+        const emailsEl = wrap.querySelector('#stat-emails');
+
+        // Pending and accepted counts
+        fetch('http://localhost:4400/api/book').then(r => r.ok ? r.json() : Promise.reject()).then(data => {
+          const list = data.bookings || data.data || [];
+          const normStatus = s => String(s || 'pending').toLowerCase();
+          const pendingCount = list.filter(x => normStatus(x.status) === 'pending').length;
+          const acceptedCount = list.filter(x => normStatus(x.status) === 'accepted').length;
+          pendingEl.textContent = String(pendingCount);
+          eventsEl.textContent = String(acceptedCount);
+          const pendingCard = document.getElementById('stat-pending-card');
+          const pendingDot = document.getElementById('stat-pending-dot');
+          if (pendingCard && pendingDot) {
+            const hasPending = pendingCount > 0;
+            pendingCard.classList.toggle('alert', hasPending);
+            pendingDot.style.display = hasPending ? 'inline-block' : 'none';
+          }
+          const acceptedCard = document.getElementById('stat-accepted-card');
+          const acceptedDot = document.getElementById('stat-accepted-dot');
+          if (acceptedCard && acceptedDot) {
+            const hasAccepted = acceptedCount > 0;
+            acceptedCard.classList.toggle('success', hasAccepted);
+            acceptedDot.style.display = hasAccepted ? 'inline-block' : 'none';
+          }
+        }).catch(() => { pendingEl.textContent = '0'; eventsEl.textContent = '0'; });
+
+        // Fetch feedback count
+        fetch('http://localhost:5000/api/feedback/count', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
+        }).then(r => r.ok ? r.json() : Promise.reject()).then(data => {
+          const unreadCount = data.unread || 0;
+          messagesEl.textContent = String(unreadCount);
+          const msgCard = document.getElementById('stat-messages-card');
+          const msgDot = document.getElementById('stat-messages-dot');
+          if (msgCard && msgDot) {
+            const has = unreadCount > 0;
+            msgCard.classList.toggle('info', has);
+            msgDot.style.display = has ? 'inline-block' : 'none';
+          }
+        }).catch(() => { 
+          messagesEl.textContent = '0';
+        });
+
+        // Fetch current month events count from the event_this_month API
+        fetch('http://localhost:3300/api/event_this_month').then(r => r.ok ? r.json() : Promise.reject()).then(data => {
+          const events = data.events || [];
+          const currentMonth = new Date().getMonth();
+          const currentYear = new Date().getFullYear();
+          
+          const thisMonthCount = events.filter(event => {
+            if (!event.Date) return false;
+            const eventDate = new Date(event.Date);
+            return eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear;
+          }).length;
+          
+          thisMonthEl.textContent = String(thisMonthCount);
+          const thisMonthCard = document.getElementById('stat-this-month-card');
+          const thisMonthDot = document.getElementById('stat-this-month-dot');
+          if (thisMonthCard && thisMonthDot) {
+            const hasThisMonth = thisMonthCount > 0;
+            thisMonthCard.classList.toggle('info', hasThisMonth);
+            thisMonthDot.style.display = hasThisMonth ? 'inline-block' : 'none';
+          }
+        }).catch(() => { 
+          // Fallback to booking API if event_this_month API fails
+          fetch('http://localhost:4400/api/book').then(r => r.ok ? r.json() : Promise.reject()).then(data => {
+            const list = data.bookings || data.data || [];
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const thisMonthCount = list.filter(booking => {
+              if (!booking.event_date) return false;
+              const eventDate = new Date(booking.event_date);
+              return eventDate.getMonth() === currentMonth && eventDate.getFullYear() === currentYear;
+            }).length;
+            
+            thisMonthEl.textContent = String(thisMonthCount);
+            const thisMonthCard = document.getElementById('stat-this-month-card');
+            const thisMonthDot = document.getElementById('stat-this-month-dot');
+            if (thisMonthCard && thisMonthDot) {
+              const hasThisMonth = thisMonthCount > 0;
+              thisMonthCard.classList.toggle('info', hasThisMonth);
+              thisMonthDot.style.display = hasThisMonth ? 'inline-block' : 'none';
+            }
+          }).catch(() => { 
+            thisMonthEl.textContent = '0';
+          });
+        });
+
+        // Fetch emails count (placeholder - you can replace with actual email API)
+        // For now, we'll set a placeholder value
+        emailsEl.textContent = '0';
+        const emailsCard = document.getElementById('stat-emails-card');
+        const emailsDot = document.getElementById('stat-emails-dot');
+        if (emailsCard && emailsDot) {
+          // You can add logic here to fetch actual email data
+          // For now, we'll just show the card without highlighting
+          emailsCard.classList.remove('info');
+          emailsDot.style.display = 'none';
+        }
+
+        // Load Activity Chart
+        loadActivityChart();
+      }
+
+      function loadActivityChart() {
+        const chartContainer = document.querySelector('.chart-container');
+        const barsContainer = document.querySelector('.bars-container');
+        const loadingEl = document.querySelector('.chart-loading');
+        const errorEl = document.querySelector('.chart-error');
+        
+        if (!chartContainer || !barsContainer) {
+          console.error('Chart container elements not found');
+          return;
+        }
+        
+        console.log('Starting to load activity chart...');
+        
+        // Show loading state
+        chartContainer.style.display = 'none';
+        loadingEl.style.display = 'block';
+        errorEl.style.display = 'none';
+        
+        // Fetch packages and their booking activity
+        Promise.all([
+          fetch('http://localhost:5000/api/packages').then(r => {
+            console.log('Packages API response status:', r.status);
+            if (!r.ok) {
+              console.warn('Packages API failed, using fallback data');
+              // Return fallback data if packages API fails
+              return { success: true, packages: [], count: 0 };
+            }
+            return r.json();
+          }).catch(err => {
+            console.warn('Packages API error, using fallback:', err.message);
+            // Return fallback data if packages API is unreachable
+            return { success: true, packages: [], count: 0 };
+          }),
+          fetch('http://localhost:4400/api/book').then(r => {
+            console.log('Bookings API response status:', r.status);
+            if (!r.ok) {
+              throw new Error(`Bookings API failed: ${r.status} ${r.statusText}`);
+            }
+            return r.json();
+          }).catch(err => {
+            console.error('Bookings API error:', err.message);
+            throw err; // Re-throw to trigger the main catch block
+          })
+        ]).then(([packagesData, bookingsData]) => {
+          console.log('Packages data:', packagesData);
+          console.log('Bookings data:', bookingsData);
+          console.log('Packages data structure:', typeof packagesData, Object.keys(packagesData || {}));
+          console.log('Bookings data structure:', typeof bookingsData, Object.keys(bookingsData || {}));
+          
+          const packages = packagesData.packages || [];
+          const bookings = bookingsData.bookings || bookingsData.data || [];
+          
+          console.log('Extracted packages count:', packages.length);
+          console.log('Extracted bookings count:', bookings.length);
+          console.log('Sample booking event types:', bookings.slice(0, 3).map(b => b.event_type || b.eventtype || b.Choose_your_event));
+          
+          // Count bookings per package by matching event type names
+          const packageActivity = {};
+          
+          // Initialize package activity tracking
+          const packageNames = [
+            'Wedding Package 1',
+            'Wedding Package 2', 
+            'Wedding Package 3',
+            'Wedding Package 4',
+            'Wedding Package 5',
+            'Wedding Package 6'
+          ];
+          
+          packageNames.forEach((name, index) => {
+            packageActivity[index + 1] = {
+              name: name,
+              count: 0,
+              id: index + 1
+            };
+          });
+          
+          // Count bookings by matching event type to package names
+          bookings.forEach(booking => {
+            const eventType = booking.event_type || booking.eventtype || booking.Choose_your_event || '';
+            
+            // Find matching package by name
+            packageNames.forEach((packageName, index) => {
+              if (eventType.toLowerCase().includes(packageName.toLowerCase()) || 
+                  eventType.toLowerCase().includes(`package ${index + 1}`)) {
+                packageActivity[index + 1].count++;
+              }
+            });
+          });
+          
+          // Convert to array and sort by activity
+          const activityData = Object.values(packageActivity).sort((a, b) => b.count - a.count);
+          
+          // Take all 6 packages for display
+          const topPackages = activityData.slice(0, 6);
+          
+          // Handle case where no packages exist
+          if (topPackages.length === 0) {
+            barsContainer.innerHTML = '<div style="text-align: center; color: #64748b; font-size: 14px; padding: 60px; width: 100%;">No packages available</div>';
+            loadingEl.style.display = 'none';
+            chartContainer.style.display = 'flex';
+            return;
+          }
+          
+          // Find max value for scaling - adjust based on screen size
+          const maxValue = Math.max(...topPackages.map(p => p.count), 1);
+          const isMobile = window.innerWidth <= 768;
+          const isSmallMobile = window.innerWidth <= 480;
+          const isTinyMobile = window.innerWidth <= 360;
+          
+          let chartHeight = 320; // Default desktop height (larger bars)
+          if (isTinyMobile) chartHeight = 140;
+          else if (isSmallMobile) chartHeight = 160;
+          else if (isMobile) chartHeight = 180;
+          
+          const scale = chartHeight / Math.max(maxValue, 100);
+          
+          // Generate bars
+          barsContainer.innerHTML = topPackages.map((pkg, index) => {
+            const height = Math.max(pkg.count * scale, 10); // Minimum height of 10px
+            const barColor = getBarColor(pkg.count, maxValue);
+            
+            // Responsive bar dimensions for 6 packages
+            let barWidth = 56;
+            let maxBarWidth = 90;
+            let fontSize = 12;
+            let labelFontSize = 12;
+            
+            if (isTinyMobile) {
+              barWidth = 26;
+              maxBarWidth = 40;
+              fontSize = 8;
+              labelFontSize = 9;
+            } else if (isSmallMobile) {
+              barWidth = 30;
+              maxBarWidth = 50;
+              fontSize = 9;
+              labelFontSize = 10;
+            } else if (isMobile) {
+              barWidth = 38;
+              maxBarWidth = 65;
+              fontSize = 10;
+              labelFontSize = 11;
+            }
+            
+            return `
+              <div class="chart-bar" style="display: flex; flex-direction: column; align-items: center; flex: 1; max-width: ${maxBarWidth}px;">
+                <!-- Value label above bar -->
+                <div style="font-size:${fontSize}px; color:#334155; font-weight:700; margin-bottom:6px;">${pkg.count}</div>
+                <div class="bar" style="
+                  width: ${barWidth}px;
+                  height: ${height}px;
+                  background: #f59e0b;
+                  border-radius: 2px;
+                  margin-bottom: 10px;
+                  transition: all 0.2s ease;
+                  cursor: pointer;
+                " title="${pkg.name}: ${pkg.count} bookings"></div>
+                <span style="font-size: ${labelFontSize}px; color: #475569; font-weight: 600; text-align: center; max-width: ${maxBarWidth}px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${pkg.name}">
+                  Package ${index + 1}
+                </span>
+              </div>
+            `;
+          }).join('');
+          
+          // Show chart
+          loadingEl.style.display = 'none';
+          chartContainer.style.display = 'flex';
+          
+        }).catch(err => {
+          console.error('Error loading activity chart:', err);
+          console.error('Error details:', {
+            message: err.message,
+            stack: err.stack,
+            name: err.name
+          });
+          
+          loadingEl.style.display = 'none';
+          chartContainer.style.display = 'none';
+          errorEl.style.display = 'block';
+          errorEl.innerHTML = `
+            <div style="text-align: center; padding: 60px; color: #dc2626; font-size: 16px;">
+              <div style="margin-bottom: 10px;">Error loading activity data</div>
+              <div style="font-size: 14px; color: #64748b;">Error: ${err.message || 'Unknown error'}</div>
+              <div style="font-size: 12px; color: #64748b; margin-top: 8px;">Check console for full details</div>
+            </div>
+          `;
+        });
+      }
+      
+      function getBarColor(value, maxValue) {
+        const intensity = value / Math.max(maxValue, 1);
+        
+        if (intensity < 0.2) {
+          return 'linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%)'; // Light gray
+        } else if (intensity < 0.4) {
+          return 'linear-gradient(180deg, #a78bfa 0%, #8b5cf6 100%)'; // Light purple
+        } else if (intensity < 0.6) {
+          return 'linear-gradient(180deg, #818cf8 0%, #6366f1 100%)'; // Medium purple
+        } else if (intensity < 0.8) {
+          return 'linear-gradient(180deg, #6366f1 0%, #4f46e5 100%)'; // Dark purple
+        } else {
+          return 'linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%)'; // Very dark purple
+        }
+      }
+
+      function loadFeedbackIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'feedbacks.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+
+      function loadPendingClientsIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'pending-clients.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadEventThisMonthIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'event_this_month.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadResetPasswordIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'reset_password.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadUpdatePagesIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'update_page.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadManagePackagesIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'admin-packages.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadListAttendeesIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'listofattendees.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadMailerIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'mailer.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadDeleteHistoryIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'delete-history.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      function loadTransactionsIntoContent() {
+        content.innerHTML = '';
+        const frame = document.createElement('iframe');
+        frame.src = 'pay/transactions-dashboard.html';
+        frame.style.width = '100%';
+        frame.style.border = '0';
+        frame.style.display = 'block';
+        frame.style.borderRadius = '12px';
+        frame.setAttribute('loading', 'lazy');
+        frame.onload = function() {
+          try {
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            const height = Math.max(
+              doc.body.scrollHeight,
+              doc.documentElement.scrollHeight
+            );
+            frame.style.height = height + 'px';
+          } catch (_) {
+            frame.style.height = '80vh';
+          }
+        };
+        content.appendChild(frame);
+      }
+
+      if (overviewLink) {
+        overviewLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#overview';
+        });
+      }
+
+      if (pendingLink) {
+        pendingLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#pending';
+        });
+      }
+
+      if (eventMonthLink) {
+        eventMonthLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#event-this-month';
+        });
+      }
+
+      if (accountSettingsLink) {
+        accountSettingsLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#account-settings';
+        });
+      }
+
+      if (messagesLink) {
+        messagesLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#feedbacks';
+        });
+      }
+
+      if (updatePagesLink) {
+        updatePagesLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#update-pages';
+        });
+      }
+
+      if (managePackagesLink) {
+        managePackagesLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#manage-packages';
+        });
+      }
+
+      if (deleteHistoryLink) {
+        deleteHistoryLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#delete-history';
+        });
+      }
+
+      if (listAttendeesLink) {
+        listAttendeesLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#list-attendees';
+        });
+      }
+
+      if (mailerLink) {
+        mailerLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#mailer';
+        });
+      }
+
+      if (transactionsLink) {
+        transactionsLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          location.hash = '#transactions';
+        });
+      }
+
+      if (nav) {
+        nav.addEventListener('click', function(e) {
+          const link = e.target.closest('a');
+          if (!link) return;
+          // Persist via hash (routeByHash also persists)
+          try { localStorage.setItem('adminLastNav', link.hash || ''); } catch (_) {}
+        });
+      }
+
+      // Initial route and back/forward support
+      window.addEventListener('hashchange', routeByHash);
+      if (!location.hash) {
+        const last = localStorage.getItem('adminLastNav');
+        if (last && typeof last === 'string' && last.startsWith('#')) {
+          location.hash = last;
+        } else {
+          location.hash = '#overview';
+        }
+      }
+      routeByHash();
+    });
+  </script>
+</body>
+</html>
+

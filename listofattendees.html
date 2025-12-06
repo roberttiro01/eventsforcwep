@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>List Attendees</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 10px;
+            min-height: 100vh;
+        }
+
+        .header-banner {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 15px 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            word-wrap: break-word;
+            line-height: 1.3;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .attendees-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .attendees-table th {
+            background-color: #f8f9fa;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #dee2e6;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .attendees-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            min-height: 45px;
+            vertical-align: top;
+        }
+
+        .attendees-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+
+        .name-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 12px;
+            padding: 5px;
+            outline: none;
+            word-wrap: break-word;
+        }
+
+        .name-input:focus {
+            background-color: transparent;
+            border: none;
+            outline: none;
+        }
+
+
+        .no-data-message {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .email-switcher {
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .email-switcher label {
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .email-switcher select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+            height: 45px;
+            width: 100%;
+        }
+
+        .email-switcher a {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-start;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .print-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .header-banner {
+                padding: 12px 8px;
+                margin-bottom: 15px;
+                font-size: 16px;
+            }
+
+            .attendees-table th {
+                padding: 8px 4px;
+                font-size: 10px;
+            }
+
+            .attendees-table td {
+                padding: 8px 4px;
+                min-height: 40px;
+            }
+
+            .name-input {
+                font-size: 10px;
+                padding: 3px;
+            }
+
+            .no-data-message {
+                padding: 20px 15px;
+                font-size: 13px;
+            }
+
+            .email-switcher {
+                margin-bottom: 15px;
+                gap: 10px;
+                flex-direction: column;
+            }
+
+            .email-switcher select {
+                width: 100%;
+                font-size: 13px;
+                padding: 10px 12px;
+                height: 40px;
+            }
+
+            .email-switcher a {
+                padding: 10px 16px;
+                font-size: 13px;
+                min-width: 120px;
+            }
+
+            .action-buttons {
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .print-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-banner {
+                font-size: 14px;
+                padding: 10px 6px;
+            }
+
+            .attendees-table th {
+                font-size: 9px;
+                padding: 6px 2px;
+            }
+
+            .attendees-table td {
+                padding: 6px 2px;
+                min-height: 35px;
+            }
+
+            .name-input {
+                font-size: 9px;
+            }
+
+            .email-switcher select {
+                width: 100%;
+                font-size: 12px;
+            }
+
+            .print-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 90px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .header-banner {
+                background-color: #4CAF50 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin-bottom: 20px;
+                page-break-inside: avoid;
+            }
+
+            .email-switcher, .action-buttons {
+                display: none !important;
+            }
+
+            .table-container {
+                overflow: visible !important;
+                box-shadow: none !important;
+            }
+
+            .attendees-table {
+                min-width: 100% !important;
+                font-size: 12px !important;
+            }
+
+            .attendees-table th {
+                background-color: #f8f9fa !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-weight: bold !important;
+            }
+
+            .attendees-table td {
+                border: 1px solid #000 !important;
+            }
+
+            .attendees-table tr:nth-child(even) {
+                background-color: #f8f9fa !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-data-message {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+
+            @page {
+                margin: 0.5in;
+                size: A4;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-banner" id="emailHeader">
+            LIST Attendees for "example@gmail.com"
+        </div>
+
+        <div id="noDataMessage" class="no-data-message">
+            <p>No attendees added yet. Go to the RSVP form to add attendees for this email.</p>
+        </div>
+
+        <div class="email-switcher">
+            <label for="emailSelect">Switch to email:</label>
+            <select id="emailSelect">
+                <option value="">Select an email...</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="attendees-table" id="attendeesTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Maid of Honor</th>
+                        <th>Best Man</th>
+                        <th>Grooms'man & Bride'smaid</th>
+                        <th>Flower Girl</th>
+                        <th>VIP</th>
+                        <th>Guest</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button class="print-btn" onclick="printAttendees()">
+                <span>🖨️</span>
+                Print
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Get all emails that have attendee data
+        function getAllEmailsWithData() {
+            const emails = new Set();
+            // Check for stored original emails
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('original_email_')) {
+                    const email = localStorage.getItem(key);
+                    emails.add(email);
+                }
+            }
+            return Array.from(emails);
+        }
+
+        // Populate email dropdown
+        function populateEmailDropdown() {
+            const emailSelect = document.getElementById('emailSelect');
+            const emails = getAllEmailsWithData();
+            
+            // Clear existing options except the first one
+            emailSelect.innerHTML = '<option value="">Select an email...</option>';
+            
+            emails.forEach(email => {
+                const option = document.createElement('option');
+                option.value = email;
+                option.textContent = email;
+                emailSelect.appendChild(option);
+            });
+        }
+
+        // Load attendees from localStorage for a specific email
+        function loadAttendeesFromStorage(email = null) {
+            const userEmail = email || localStorage.getItem('user_email');
+            if (!userEmail) {
+                populateEmailDropdown();
+                return;
+            }
+
+            // Update header with original email format
+            document.getElementById('emailHeader').textContent = `LIST Attendees for "${userEmail}"`;
+
+            const emailKey = `attendees_${userEmail.replace(/[^a-zA-Z0-9]/g, '')}`;
+            const categories = [
+                { key: 'maid_of_honor', title: 'Maid of Honor' },
+                { key: 'best_man', title: 'Best Man' },
+                { key: 'bridesmaids', title: 'Grooms\'man & Bride\'smaid' },
+                { key: 'flower_girls', title: 'Flower Girl' },
+                { key: 'vips', title: 'VIP' },
+                { key: 'guests', title: 'Guest' }
+            ];
+
+            const table = document.getElementById('attendeesTable');
+            const tbody = table.querySelector('tbody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+
+            // Get all attendees for this email
+            let allAttendees = [];
+            categories.forEach(cat => {
+                const attendees = JSON.parse(localStorage.getItem(`${emailKey}_${cat.key}`) || '[]');
+                attendees.forEach(attendee => {
+                    allAttendees.push({ ...attendee, category: cat.key });
+                });
+            });
+
+            if (allAttendees.length === 0) {
+                table.style.display = 'none';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+
+            // Group attendees by category
+            const groupedAttendees = {};
+            categories.forEach(cat => {
+                groupedAttendees[cat.key] = JSON.parse(localStorage.getItem(`${emailKey}_${cat.key}`) || '[]');
+            });
+
+            // Find the maximum number of attendees in any category
+            const maxCount = Math.max(...Object.values(groupedAttendees).map(arr => arr.length));
+
+            if (maxCount === 0) {
+                table.style.display = 'none';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+
+            // Create rows
+            for (let i = 0; i < maxCount; i++) {
+                const row = document.createElement('tr');
+                
+                categories.forEach(cat => {
+                    const cell = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'name-input';
+                    input.placeholder = '';
+                    
+                    // Set value if attendee exists at this index
+                    if (groupedAttendees[cat.key][i]) {
+                        input.value = groupedAttendees[cat.key][i].name;
+                    }
+                    // Make input read-only
+                    input.readOnly = true;
+                    
+                    cell.appendChild(input);
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            }
+
+            // Show table and hide no-data message
+            table.style.display = 'table';
+            noDataMessage.style.display = 'none';
+            
+            // Show action buttons when data is available
+            document.getElementById('actionButtons').style.display = 'flex';
+        }
+
+        function addRow() {
+            const table = document.getElementById('attendeesTable');
+            const tbody = table.querySelector('tbody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            
+            // Show table and hide no-data message
+            table.style.display = 'table';
+            noDataMessage.style.display = 'none';
+            
+            // Show action buttons when data is available
+            document.getElementById('actionButtons').style.display = 'flex';
+            
+            const newRow = document.createElement('tr');
+            
+            for (let i = 0; i < 6; i++) {
+                const cell = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'name-input';
+                input.placeholder = '';
+                input.readOnly = true;
+                cell.appendChild(input);
+                newRow.appendChild(cell);
+            }
+            
+            tbody.appendChild(newRow);
+        }
+
+        function autoAddRowIfNeeded() {
+            const table = document.getElementById('attendeesTable');
+            const tbody = table.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            
+            // Check if the last row has any data
+            if (rows.length > 0) {
+                const lastRow = rows[rows.length - 1];
+                const inputs = lastRow.querySelectorAll('input');
+                let hasData = false;
+                
+                inputs.forEach(input => {
+                    if (input.value.trim() !== '') {
+                        hasData = true;
+                    }
+                });
+                
+                // If last row has data, add a new empty row
+                if (hasData) {
+                    addRow();
+                }
+            }
+        }
+
+        function checkForData() {
+            const table = document.getElementById('attendeesTable');
+            const tbody = table.querySelector('tbody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const rows = tbody.querySelectorAll('tr');
+            
+            let hasData = false;
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                inputs.forEach(input => {
+                    if (input.value.trim() !== '') {
+                        hasData = true;
+                    }
+                });
+            });
+            
+            if (hasData) {
+                table.style.display = 'table';
+                noDataMessage.style.display = 'none';
+                document.getElementById('actionButtons').style.display = 'flex';
+            } else if (rows.length === 0) {
+                table.style.display = 'none';
+                noDataMessage.style.display = 'block';
+                document.getElementById('actionButtons').style.display = 'none';
+            }
+        }
+
+        // Load attendees when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for email parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            
+            // Don't auto-load data on page refresh
+            populateEmailDropdown();
+            
+            // Set default state - no data shown
+            document.getElementById('emailHeader').textContent = 'LIST Attendees';
+            document.getElementById('attendeesTable').style.display = 'none';
+            document.getElementById('noDataMessage').style.display = 'none';
+            
+            // If email parameter exists, load that email's data
+            if (emailParam) {
+                document.getElementById('emailSelect').value = emailParam;
+                loadAttendeesFromStorage(emailParam);
+            }
+            
+            const table = document.getElementById('attendeesTable');
+            table.addEventListener('input', function() {
+                checkForData();
+                // Add a small delay to prevent too many rows being added at once
+                setTimeout(autoAddRowIfNeeded, 500);
+            });
+
+            // Handle email switching
+            document.getElementById('emailSelect').addEventListener('change', function() {
+                const selectedEmail = this.value;
+                if (selectedEmail) {
+                    loadAttendeesFromStorage(selectedEmail);
+                } else {
+                    // If no email selected, hide everything
+                    document.getElementById('emailHeader').textContent = 'LIST Attendees';
+                    document.getElementById('attendeesTable').style.display = 'none';
+                    document.getElementById('noDataMessage').style.display = 'none';
+                    document.getElementById('actionButtons').style.display = 'none';
+                }
+            });
+        });
+
+        // Print function
+        function printAttendees() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

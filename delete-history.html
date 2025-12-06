@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete EVENTS History  CWEP</title>
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background: transparent;
+        }
+        .wrapper { width: 100%; display: flex; justify-content: center; padding: 20px; }
+        .card {
+            width: 100%; max-width: 1400px; background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(6px); border-radius: 16px; padding: 28px 28px 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .title { font-size: 30px; font-weight: 800; color: #1e1e1e; }
+        .btn { display:inline-flex; align-items:center; justify-content:center; padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:700; font-size:12px; }
+        .btn-primary { background:#7d0d24; color:#fff; }
+        .btn-primary:hover { background:#a0152e; }
+        .table-container { width:100%; overflow-x:auto; max-height:65vh; overflow-y:auto; }
+        table { width:100%; border-collapse:collapse; color:#1f1f1f; table-layout:auto; }
+        thead th { font-weight:700; text-align:left; font-size:14px; color:#7d0d24; padding:10px 8px; white-space:nowrap; position:sticky; top:0; background:transparent; border-bottom:2px solid rgba(125,13,36,0.35); }
+        tbody td { padding:10px 8px; border-top:2px solid rgba(125,13,36,0.35); font-size:14px; word-break:break-word; overflow-wrap:anywhere; }
+        tbody tr:last-child td { border-bottom:2px solid rgba(125,13,36,0.35); }
+        /* match compact look */
+        tbody td:first-child, thead th:first-child { min-width: 240px; }
+        tbody td:last-child, thead th:last-child { min-width: 260px; }
+        .actions-col { width: 120px; white-space: nowrap; }
+        .act-btn { display:inline-flex; align-items:center; justify-content:center; padding:6px 10px; border-radius:8px; border:none; cursor:pointer; font-weight:700; font-size:12px; }
+        .act-delete { background:#dc2626; color:#fff; }
+        .act-delete:hover { background:#b91c1c; }
+        .empty { text-align:center; padding:24px; color:#666; }
+        .pagination { display:flex; justify-content:center; gap:8px; margin-top:12px; }
+        .page-label { font-size:13px; color:#1f1f1f; }
+        .page-btn { padding:6px 10px; background:#f3f4f6; color:#333; border:none; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer; }
+        .page-btn:disabled { opacity:0.5; cursor:not-allowed; }
+        /* scrollbar similar to dashboard */
+        .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 3px; }
+        .table-container::-webkit-scrollbar-thumb { background: rgba(125, 13, 36, 0.3); border-radius: 3px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: rgba(125, 13, 36, 0.5); }
+        @media (max-width: 640px) { .header { flex-direction:column; align-items:stretch; } }
+    </style>
+    <!-- SweetAlert2 for modals like update pages -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Modal helpers (match update_page.html UX)
+        function notifySuccess(message){
+            if (window.Swal && Swal.fire) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: String(message||''),
+                    showConfirmButton: false,
+                    timer: 1400,
+                    timerProgressBar: true,
+                    position: 'center'
+                });
+            } else { alert(String(message||'')); }
+        }
+        function notifyError(message){
+            if (window.Swal && Swal.fire) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: String(message||''),
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#1d4ed8'
+                });
+            } else { alert(String(message||'')); }
+        }
+        async function confirmAction(message){
+            if (window.Swal && Swal.fire) {
+                const r = await Swal.fire({
+                    icon: 'warning',
+                    title: 'Are you sure?',
+                    text: String(message || ''),
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, continue',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonText: 'Cancel'
+                });
+                return !!r.isConfirmed;
+            }
+            return Promise.resolve(confirm(String(message || '')));
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('hist-body');
+            const prevBtn = document.getElementById('hist-prev');
+            const nextBtn = document.getElementById('hist-next');
+            const pageSpan = document.getElementById('hist-page');
+
+            let rows = [];
+            let filtered = [];
+            let page = 1;
+            const perPage = 10;
+
+            function formatDateTime(value) {
+                if (!value) return '';
+                try {
+                    const d = new Date(value);
+                    if (isNaN(d.getTime())) return String(value);
+                    return d.toLocaleString('en-PH', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true, timeZone:'Asia/Manila' });
+                } catch { return String(value); }
+            }
+
+            async function handleDelete(id) {
+                if (!id) return;
+                const ok = await confirmAction('Permanently delete this history record? This cannot be undone.');
+                if (!ok) return;
+                try {
+                    // Try DELETE first; if 404 (route missing) or 405 (method not allowed), fallback to POST /api/history/delete
+                    let res = await fetch(`http://localhost:4400/api/history/${encodeURIComponent(String(id))}` , { method: 'DELETE' });
+                    if (res.status === 404 || res.status === 405) {
+                        res = await fetch('http://localhost:4400/api/history/delete', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id })
+                        });
+                    }
+                    let payload = null;
+                    try { payload = await res.json(); } catch (_) { payload = null; }
+                    if (!res.ok || !(payload && payload.ok)) {
+                        const msg = (payload && (payload.error || payload.message)) || `Delete failed (HTTP ${res.status})`;
+                        notifyError(msg);
+                        return;
+                    }
+                    // Reload latest from server to keep pagination consistent
+                    await loadHistory();
+                    notifySuccess('History record deleted successfully');
+                } catch (e) {
+                    notifyError('Failed to delete');
+                }
+            }
+
+            function renderPage() {
+                const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+                page = Math.min(page, totalPages);
+                const start = (page - 1) * perPage;
+                const pageRows = filtered.slice(start, start + perPage);
+
+                tbody.innerHTML = '';
+                if (pageRows.length === 0) {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.colSpan = 3;
+                    td.className = 'empty';
+                    td.textContent = 'No history found';
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                } else {
+                    pageRows.forEach(r => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${r.full_name ?? ''}</td>
+                            <td>${r.email ?? ''}</td>
+                            <td class="actions-col">
+                                <button class="act-btn act-delete" data-id="${r.id}">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    // Bind delete buttons
+                    tbody.querySelectorAll('.act-delete').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const id = e.currentTarget.getAttribute('data-id');
+                            handleDelete(id);
+                        });
+                    });
+                }
+
+                pageSpan.textContent = `${page} / ${totalPages}`;
+                prevBtn.disabled = page <= 1;
+                nextBtn.disabled = page >= totalPages;
+            }
+
+            async function loadHistory() {
+                try {
+                    const res = await fetch('http://localhost:4400/api/history');
+                    const data = await res.json();
+                    rows = data.history || [];
+                    filtered = rows.slice();
+                    page = 1;
+                    renderPage();
+                } catch (e) {
+                    tbody.innerHTML = '';
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.colSpan = 2; td.className = 'empty';
+                    td.textContent = 'Failed to load history. Please try again later.';
+                    tr.appendChild(td); tbody.appendChild(tr);
+                }
+            }
+
+            // Wiring
+            prevBtn.addEventListener('click', () => { if (page > 1) { page -= 1; renderPage(); } });
+            nextBtn.addEventListener('click', () => { const totalPages = Math.max(1, Math.ceil(filtered.length / perPage)); if (page < totalPages) { page += 1; renderPage(); } });
+
+            loadHistory();
+        });
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="card">
+            <div class="header">
+                <div class="title">Delete EVENTS History</div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th class="actions-col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hist-body"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="hist-prev" class="page-btn">Prev</button>
+                <span id="hist-page" class="page-label"></span>
+                <button id="hist-next" class="page-btn">Next</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

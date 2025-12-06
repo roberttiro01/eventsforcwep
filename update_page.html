@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Pages</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f172a;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #3b82f6;
+    }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background: transparent; color: var(--text); overflow-x: hidden; padding: 24px 16px; }
+    .card { background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(226, 232, 240, 0.6); border-radius: 16px; padding: 24px; max-width: 1000px; width: 100%; margin: 0 auto; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px); display: flex; gap: 15px; }
+    .form-content { display: flex; flex-direction: column; gap: 20px; flex: 1; }
+    .preview-section { flex: 0 0 300px; display: flex; flex-direction: column; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+    input[type="text"], textarea, select { width: 100%; max-width: 500px; padding: 12px; background: rgba(248, 250, 252, 0.8); color: var(--text); border: 1px solid rgba(226, 232, 240, 0.6); border-radius: 10px; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; backdrop-filter: blur(10px); }
+    input[type="text"]:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); background: rgba(255, 255, 255, 0.95); }
+    #bgUrl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (max-width: 700px) { 
+      input[type="text"], textarea, select { max-width: 100%; }
+    }
+    @media (max-width: 1024px) {
+      .card { flex-direction: column; max-width: 600px; }
+      .preview-section { flex: none; }
+    }
+    textarea { 
+      min-height: 120px; 
+      resize: vertical; 
+      overflow-y: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    textarea::-webkit-scrollbar { /* WebKit */
+      display: none;
+    }
+    .btns { display:flex; gap:10px; padding-top: 16px; justify-content: flex-start; }
+    button { padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(226, 232, 240, 0.6); background: rgba(241, 245, 249, 0.8); color: var(--text); cursor: pointer; transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease; backdrop-filter: blur(10px); }
+    button:hover { background: rgba(226, 232, 240, 0.9); border-color: var(--accent); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    button:active { transform: translateY(1px); }
+    button.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-color: transparent; color: white; box-shadow: 0 10px 22px rgba(59, 130, 246, 0.3); }
+    button.primary:hover { filter: brightness(1.05); transform: translateY(-2px); box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4); }
+    /* Make main action buttons smaller */
+    #save, #clear, #clearAll { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
+    .hint { color: var(--muted); font-size: 12px; }
+    .preview { background: rgba(248, 250, 252, 0.8); border: none; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; width: 100%; box-shadow: none; }
+    .img-preview { width: 100%; height: 300px; background: rgba(226, 232, 240, 0.6); border-radius: 12px; background-size: contain; background-position: center; background-repeat: no-repeat; }
+    .spacer { height: 8px; }
+    
+    /* Remove scrollbars from all elements */
+    select {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+    }
+    select::-webkit-scrollbar { /* WebKit */
+      display: none;
+    }
+    
+    /* Ensure no page-level scrollbars */
+    html, body {
+      overflow-x: hidden;
+    }
+    
+    /* Do not hide scrollbars globally so the page can scroll vertically */
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="form-content">
+      <div class="form-group">
+        <label for="page">Page</label>
+        <select id="page">
+          <option value="index">Home (index.html)</option>
+          <option value="contact">Contact (contact.html)</option>
+          <option value="services">Services (services.html)</option>
+          <option value="testimonials">Testimonials (testimonials.html)</option>
+          <option value="about">About (about.html)</option>
+          <option value="packages">Packages (packages.html)</option>
+          <option value="global">All pages – Hex Logo</option>
+        </select>
+      </div>
+      <div class="form-group" id="indexSectionRow" style="display:none;">
+        <label for="indexSection">Index Section</label>
+        <select id="indexSection">
+          <option value="">Select section to update...</option>
+          <option value="slide">Homepage Slideshow</option>
+          <option value="portfolio">Portfolio Photos</option>
+          <option value="finalSlide">Final Slides</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="aboutSectionRow" style="display:none;">
+        <label for="aboutSection">About Section</label>
+        <select id="aboutSection">
+          <option value="">Select section to update...</option>
+          <option value="hero">About Hero</option>
+          <option value="content">About Content</option>
+          <option value="story">Our Story</option>
+          <option value="banner">Romantic Banner</option>
+          <option value="organizers">Organizers</option>
+        </select>
+      </div>
+  
+      <div class="form-group" id="indexSlideRow" style="display:none;">
+        <label for="slide">Home slide</label>
+        <select id="slide">
+          <option value="0">Slide 1</option>
+          <option value="1">Slide 2</option>
+          <option value="2">Slide 3</option>
+        </select>
+      </div>
+      <div class="form-group" id="portfolioRow" style="display:none;">
+        <label for="portfolioPhoto">Portfolio Photo</label>
+        <select id="portfolioPhoto">
+          <option value="0">Portfolio Photo 1</option>
+          <option value="1">Portfolio Photo 2</option>
+          <option value="2">Portfolio Photo 3</option>
+          <option value="3">Portfolio Photo 4</option>
+          <option value="4">Portfolio Photo 5</option>
+          <option value="5">Portfolio Photo 6</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="finalSlideRow" style="display:none;">
+        <label for="finalSlide">Final Slide</label>
+        <select id="finalSlide">
+          <option value="0">Final Slide 1</option>
+          <option value="1">Final Slide 2</option>
+          <option value="2">Final Slide 3</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="servicesCardRow" style="display:none;">
+        <label for="servicesCardIndex">Services Card</label>
+        <select id="servicesCardIndex">
+          <option value="0">Card 1</option>
+          <option value="1">Card 2</option>
+          <option value="2">Card 3</option>
+          <option value="3">Card 4</option>
+          <option value="4">Card 5</option>
+          <option value="5">Card 6</option>
+          <option value="6">Card 7</option>
+          <option value="7">Card 8</option>
+        </select>
+      </div>
+
+      
+
+      <div class="form-group" id="organizerRow" style="display:none;">
+        <label for="organizerSelect">Organizer</label>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+          <select id="organizerSelect" style="min-width:220px;"></select>
+          <button id="organizerNewBtn" type="button">New</button>
+          <button id="organizerSaveBtn" type="button" class="primary">Save Organizer</button>
+          <button id="organizerDeleteBtn" type="button">Delete Selected</button>
+        </div>
+        <div class="hint">Pick an existing organizer to edit, or click New to add one.</div>
+      </div>
+
+
+      <div class="form-group">
+        <label for="text1" id="text1Label">Main Title</label>
+        <input id="text1" type="text" placeholder="Optional" />
+        <label for="text2" id="text2Label">Subtitle</label>
+        <input id="text2" type="text" placeholder="Optional" />
+        <label for="text3" id="text3Label" style="display:none;">Caption</label>
+        <input id="text3" type="text" placeholder="Optional" style="display:none;" />
+      </div>
+
+      <div class="form-group">
+        <label for="file">Or Upload Background Image</label>
+        <input id="file" type="file" accept="image/*" />
+        <div class="hint">Max ~15MB. Images uploaded with admin are stored on the server.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="bgUrl">BG image URL</label>
+        <input id="bgUrl" type="text" placeholder="https://... or leave blank to use upload" />
+      </div>
+
+      <div class="form-group" id="hexTextColorRow" style="display:none;">
+        <label for="hexTextColor">Hex Logo Text Color</label>
+        <input id="hexTextColor" type="color" />
+        <div class="hint">Optional. Pick a text color for the hex logo on all pages.</div>
+      </div>
+
+    </div>
+
+    <div class="preview-section">
+      <div class="preview">
+        <div class="img-preview" id="imgPreview"></div>
+        <div class="hint" id="previewHint">Preview of background</div>
+      </div>
+      
+      <div class="btns">
+        <button class="primary" id="save">Save</button>
+        <button id="clear">Clear Page Overrides</button>
+        <button id="clearAll">Clear ALL Overrides</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const selPage = document.getElementById('page');
+    const bgUrl = document.getElementById('bgUrl');
+    const indexSection = document.getElementById('indexSection');
+    const aboutSection = document.getElementById('aboutSection');
+    const slideSel = document.getElementById('slide');
+    const indexSlideRow = document.getElementById('indexSlideRow');
+    const portfolioRow = document.getElementById('portfolioRow');
+    const portfolioPhoto = document.getElementById('portfolioPhoto');
+    const finalSlideRow = document.getElementById('finalSlideRow');
+    const finalSlide = document.getElementById('finalSlide');
+    const servicesCardRow = document.getElementById('servicesCardRow');
+    const servicesCardIndex = document.getElementById('servicesCardIndex');
+    const organizerRow = document.getElementById('organizerRow');
+    const organizerSelect = document.getElementById('organizerSelect');
+    const organizerNewBtn = document.getElementById('organizerNewBtn');
+    const organizerSaveBtn = document.getElementById('organizerSaveBtn');
+    const organizerDeleteBtn = document.getElementById('organizerDeleteBtn');
+    // SweetAlert2 helpers
+    function notifySuccess(message){
+      if (window.Swal && Swal.fire) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: String(message||''),
+          showConfirmButton: false,
+          timer: 1400,
+          timerProgressBar: true,
+          position: 'center',
+        });
+      } else { alert(String(message||'')); }
+    }
+    function notifyError(message){
+      if (window.Swal && Swal.fire) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: String(message||''),
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#1d4ed8'
+        });
+      } else { alert(String(message||'')); }
+    }
+    async function confirmAction(message){
+      if (window.Swal && Swal.fire) {
+        const r = await Swal.fire({
+          icon: 'warning',
+          title: 'Are you sure?',
+          text: String(message || ''),
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete',
+          confirmButtonColor: '#dc2626',
+          cancelButtonText: 'Cancel'
+        });
+        return !!r.isConfirmed;
+      }
+      return Promise.resolve(confirm(String(message || '')));
+    }
+    let organizerIndex = 0;
+    const file = document.getElementById('file');
+    const text1 = document.getElementById('text1');
+    const text2 = document.getElementById('text2');
+    const text3 = document.getElementById('text3');
+    const text1Label = document.getElementById('text1Label');
+    const text2Label = document.getElementById('text2Label');
+    const text3Label = document.getElementById('text3Label');
+    const imgPreview = document.getElementById('imgPreview');
+    const saveBtn = document.getElementById('save');
+    const clearBtn = document.getElementById('clear');
+    const clearAllBtn = document.getElementById('clearAll');
+    const hexTextColorRow = document.getElementById('hexTextColorRow');
+    const hexTextColorInput = document.getElementById('hexTextColor');
+    
+
+    function storageKey(page) { return `pageOverrides:${page}`; }
+    function api(url) { return (location && location.protocol === 'file:' ? 'http://localhost:5000' : '') + url; }
+    function getToken() { try { return localStorage.getItem('adminToken') || ''; } catch (_) { return ''; } }
+    async function backendGet(page) {
+      try {
+        const r = await fetch(api(`/api/page-overrides/${page}`));
+        if (!r.ok) return null;
+        const j = await r.json();
+        return (j && j.data) || null;
+      } catch (_) { return null; }
+    }
+    async function backendSave(page, data) {
+      try {
+        const r = await fetch(api(`/api/page-overrides/${page}`), {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify(data)
+        });
+        return r.ok;
+      } catch (_) { return false; }
+    }
+    async function backendClear(page) {
+      try {
+        const r = await fetch(api(`/api/page-overrides/${page}`), { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+        return r.ok;
+      } catch (_) { return false; }
+    }
+    async function backendUpload(file) {
+      try {
+        const fd = new FormData();
+        fd.append('image', file);
+        const r = await fetch(api('/api/page-overrides/upload'), { method: 'POST', headers: { 'Authorization': `Bearer ${getToken()}` }, body: fd });
+        if (!r.ok) return null;
+        const j = await r.json();
+        return j && j.url ? j.url : null;
+      } catch (_) { return null; }
+    }
+
+    async function load(page) {
+      try {
+        let data = await backendGet(page);
+        if (!data) {
+          const raw = localStorage.getItem(storageKey(page));
+          data = raw ? JSON.parse(raw) : {};
+        }
+        const isIndex = page === 'index';
+        const isAbout = page === 'about';
+        const isServices = page === 'services';
+        const isGlobal = page === 'global';
+        const indexSectionRow = document.getElementById('indexSectionRow');
+        const aboutSectionRow = document.getElementById('aboutSectionRow');
+        if (indexSectionRow) indexSectionRow.style.display = isIndex ? 'grid' : 'none';
+        if (aboutSectionRow) aboutSectionRow.style.display = isAbout ? 'grid' : 'none';
+        if (servicesCardRow) servicesCardRow.style.display = isServices ? 'grid' : 'none';
+        if (hexTextColorRow) hexTextColorRow.style.display = isGlobal ? 'grid' : 'none';
+        if (isIndex && indexSection && !indexSection.value) { try { indexSection.value = 'slide'; } catch (_) {} }
+        if (isAbout && aboutSection && !aboutSection.value) { try { aboutSection.value = 'hero'; } catch (_) {} }
+        
+        // Show/hide specific section rows based on selection
+        const selectedSection = (indexSection && indexSection.value) || '';
+        if (indexSlideRow) indexSlideRow.style.display = (isIndex && selectedSection === 'slide') ? 'grid' : 'none';
+        if (portfolioRow) portfolioRow.style.display = (isIndex && selectedSection === 'portfolio') ? 'grid' : 'none';
+        if (finalSlideRow) finalSlideRow.style.display = (isIndex && selectedSection === 'finalSlide') ? 'grid' : 'none';
+        
+        // Show/hide and label fields based on section selection
+        if (isIndex) {
+          if (selectedSection === 'portfolio') {
+            // Portfolio photos - only show caption
+            text1Label.style.display = 'none';
+            text1.style.display = 'none';
+            text2Label.style.display = 'none';
+            text2.style.display = 'none';
+            text3Label.style.display = 'block';
+            text3.style.display = 'block';
+            text3Label.textContent = 'Caption';
+          } else if (selectedSection === 'slide') {
+            // Homepage slideshow - show title, subtitle, description
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text2Label.style.display = 'block';
+            text2.style.display = 'block';
+            text3Label.style.display = 'block';
+            text3.style.display = 'block';
+            text1Label.textContent = 'Main Title';
+            text2Label.textContent = 'Subtitle';
+            text3Label.textContent = 'Description';
+          } else if (selectedSection === 'finalSlide') {
+            // Final slides - show title only
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text2Label.style.display = 'none';
+            text2.style.display = 'none';
+            text3Label.style.display = 'none';
+            text3.style.display = 'none';
+            text1Label.textContent = 'Final Slide Title';
+          } else {
+            // No section selected - hide all
+            text1Label.style.display = 'none';
+            text1.style.display = 'none';
+            text2Label.style.display = 'none';
+            text2.style.display = 'none';
+            text3Label.style.display = 'none';
+            text3.style.display = 'none';
+          }
+        } else if (isAbout) {
+          const selectedAboutSection = aboutSection.value;
+          if (selectedAboutSection === 'hero') {
+            // About Hero - show title only
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text1.required = false;
+            text2.required = false;
+            text2Label.style.display = 'none';
+            text2.style.display = 'none';
+            text3Label.style.display = 'none';
+            text3.style.display = 'none';
+            text1.placeholder = 'Optional';
+            text2.placeholder = 'Optional';
+            text1Label.textContent = 'About Title';
+          } else if (selectedAboutSection === 'content') {
+            // About Content - show title, subtitle, description
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text1.required = false;
+            text2.required = false;
+            text2Label.style.display = 'block';
+            text2.style.display = 'block';
+            text3Label.style.display = 'block';
+            text3.style.display = 'block';
+            text1.placeholder = 'Optional';
+            text2.placeholder = 'Optional';
+            text1Label.textContent = 'Section Title';
+            text2Label.textContent = 'Subtitle';
+            text3Label.textContent = 'Description';
+          } else if (selectedAboutSection === 'story') {
+            // Our Story - show title, subtitle, description
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text1.required = false;
+            text2.required = false;
+            text2Label.style.display = 'block';
+            text2.style.display = 'block';
+            text3Label.style.display = 'block';
+            text3.style.display = 'block';
+            text1.placeholder = 'Optional';
+            text2.placeholder = 'Optional';
+            text1Label.textContent = 'Story Title';
+            text2Label.textContent = 'Subtitle';
+            text3Label.textContent = 'Description';
+          } else if (selectedAboutSection === 'banner') {
+            // Romantic Banner - show banner text only
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text1.required = false;
+            text2.required = false;
+            text2Label.style.display = 'none';
+            text2.style.display = 'none';
+            text3Label.style.display = 'none';
+            text3.style.display = 'none';
+            text1.placeholder = 'Optional';
+            text2.placeholder = 'Optional';
+            text1Label.textContent = 'Banner Text';
+          } else if (selectedAboutSection === 'organizers') {
+            if (organizerRow) organizerRow.style.display = 'grid';
+            
+            text1Label.style.display = 'block';
+            text1.style.display = 'block';
+            text1.required = true;
+            text2.required = true;
+            text2Label.style.display = 'block';
+            text2.style.display = 'block';
+            text3Label.style.display = 'none';
+            text3.style.display = 'none';
+            text1Label.textContent = 'Name';
+            text2Label.textContent = 'Role';
+            text1.placeholder = 'Required';
+            text2.placeholder = 'Required';
+            // Load organizers from backend
+            try {
+              const r = await fetch(api('/api/organizers'));
+              const j = await r.json();
+              const list = (j && j.data) || [];
+              if (organizerSelect) {
+                organizerSelect.innerHTML = '';
+                list.forEach(o => {
+                  const opt = document.createElement('option');
+                  opt.value = String(o.id);
+                  opt.textContent = `${o.name || '(no name)'} — ${o.role || ''}`.trim();
+                  opt.dataset.bg = o.bg || '';
+                  opt.dataset.name = o.name || '';
+                  opt.dataset.role = o.role || '';
+                  organizerSelect.appendChild(opt);
+                });
+              }
+              if (list.length > 0) {
+                const first = list[0];
+                text1.value = first.name || '';
+                text2.value = first.role || '';
+                bgUrl.value = first.bg || '';
+                updatePreview(first.bg || '');
+              } else {
+                text1.value = '';
+                text2.value = '';
+                bgUrl.value = '';
+                updatePreview('');
+              }
+            } catch(_) {}
+          } else {
+            // No section selected - hide all
+            text1Label.style.display = 'none';
+            text1.style.display = 'none';
+            text2Label.style.display = 'none';
+            text2.style.display = 'none';
+            text3Label.style.display = 'none';
+            text3.style.display = 'none';
+            if (organizerRow) organizerRow.style.display = 'none';
+            
+          }
+        } else if (isServices) {
+          // Services page — allow editing individual cards (title/desc/bg)
+          text1Label.style.display = 'block';
+          text1.style.display = 'block';
+          text2Label.style.display = 'block';
+          text2.style.display = 'block';
+          text3Label.style.display = 'none';
+          text3.style.display = 'none';
+          text1Label.textContent = 'Card Title';
+          text2Label.textContent = 'Card Description';
+          const idx = parseInt(servicesCardIndex.value, 10) || 0;
+          const cards = (data && data.cards) || [];
+          const card = Array.isArray(cards) ? (cards[idx] || {}) : ((cards[String(idx)]) || {});
+          bgUrl.value = card.bg || '';
+          text1.value = card.text1 || '';
+          text2.value = card.text2 || '';
+          updatePreview(bgUrl.value);
+        } else if (isGlobal) {
+          // Global hex logo override – hex logo text + optional image
+          text1Label.style.display = 'block';
+          text1.style.display = 'block';
+          text2Label.style.display = 'none';
+          text2.style.display = 'none';
+          text3Label.style.display = 'none';
+          text3.style.display = 'none';
+          text1Label.textContent = 'Hex Logo Text';
+        } else {
+          // Other pages - show standard fields
+          text1Label.style.display = 'block';
+          text1.style.display = 'block';
+          text2Label.style.display = 'block';
+          text2.style.display = 'block';
+          text3Label.style.display = 'block';
+          text3.style.display = 'block';
+          text1Label.textContent = 'Main Title';
+          text2Label.textContent = 'Subtitle';
+          text3Label.textContent = 'Description';
+        }
+        
+        if (isIndex) {
+          if (selectedSection === 'portfolio') {
+            // Portfolio photo mode
+            const idx = parseInt(portfolioPhoto.value, 10) || 0;
+            const portfolioData = (data && data.portfolio && (Array.isArray(data.portfolio) ? data.portfolio[idx] : (data.portfolio[String(idx)] || {}))) || {};
+            bgUrl.value = portfolioData.bg || '';
+            text1.value = portfolioData.text1 || '';
+            text2.value = portfolioData.text2 || '';
+            text3.value = portfolioData.text3 || '';
+            updatePreview(bgUrl.value);
+          } else if (selectedSection === 'finalSlide') {
+            // Final slide mode
+            const idx = parseInt(finalSlide.value, 10) || 0;
+            const finalSlideData = (data && data.finalSlides && (Array.isArray(data.finalSlides) ? data.finalSlides[idx] : (data.finalSlides[String(idx)] || {}))) || {};
+            bgUrl.value = finalSlideData.bg || '';
+            text1.value = finalSlideData.text1 || '';
+            text2.value = finalSlideData.text2 || '';
+            text3.value = finalSlideData.text3 || '';
+            updatePreview(bgUrl.value);
+          } else if (selectedSection === 'slide') {
+            // Slide mode
+          const idx = parseInt(slideSel.value, 10) || 0;
+          const slideData = (data && data.slides && (Array.isArray(data.slides) ? data.slides[idx] : (data.slides[String(idx)] || {}))) || {};
+          bgUrl.value = slideData.bg || '';
+          text1.value = slideData.text1 || '';
+          text2.value = slideData.text2 || '';
+            text3.value = slideData.text3 || '';
+          updatePreview(bgUrl.value);
+          } else {
+            // No section selected - clear fields
+            bgUrl.value = '';
+            text1.value = '';
+            text2.value = '';
+            text3.value = '';
+            updatePreview('');
+          }
+        } else if (isAbout) {
+          const selectedAboutSection = aboutSection.value;
+          if (selectedAboutSection === 'hero') {
+            const heroData = (data && data.hero) || {};
+            bgUrl.value = heroData.bg || '';
+            text1.value = heroData.text1 || '';
+            text2.value = heroData.text2 || '';
+            text3.value = heroData.text3 || '';
+            updatePreview(heroData.bg || '');
+          } else if (selectedAboutSection === 'content') {
+            const contentData = (data && data.content) || {};
+            bgUrl.value = contentData.bg || '';
+            text1.value = contentData.text1 || '';
+            text2.value = contentData.text2 || '';
+            text3.value = contentData.text3 || '';
+            updatePreview(contentData.bg || '');
+          } else if (selectedAboutSection === 'story') {
+            const storyData = (data && data.story) || {};
+            bgUrl.value = storyData.bg || '';
+            text1.value = storyData.text1 || '';
+            text2.value = storyData.text2 || '';
+            text3.value = storyData.text3 || '';
+            updatePreview(storyData.bg || '');
+          } else if (selectedAboutSection === 'banner') {
+            const bannerData = (data && data.banner) || {};
+            bgUrl.value = bannerData.bg || '';
+            text1.value = bannerData.text1 || '';
+            text2.value = bannerData.text2 || '';
+            text3.value = bannerData.text3 || '';
+            updatePreview(bannerData.bg || '');
+          } else if (selectedAboutSection === 'organizers') {
+            const idx = Math.max(0, organizerIndex || 0);
+            const orgData = (data && data.organizers && (Array.isArray(data.organizers) ? data.organizers[idx] : (data.organizers[String(idx)] || {}))) || {};
+            bgUrl.value = orgData.bg || '';
+            text1.value = orgData.text1 || '';
+            text2.value = orgData.text2 || '';
+            text3.value = '';
+            updatePreview(orgData.bg || '');
+          } else {
+            // No section selected - clear fields
+            bgUrl.value = '';
+            text1.value = '';
+            text2.value = '';
+            text3.value = '';
+            updatePreview('');
+          }
+        } else if (isGlobal) {
+          // Load global hex logo text, optional image and text color
+          const hexData = data || {};
+          bgUrl.value = hexData.hexLogoBg || '';
+          text1.value = hexData.hexLogoText || '';
+          text2.value = '';
+          text3.value = '';
+          if (hexTextColorInput) {
+            hexTextColorInput.value = hexData.hexLogoTextColor || '#ffffff';
+          }
+          updatePreview(bgUrl.value);
+        } else {
+          bgUrl.value = data.bg || '';
+          text1.value = data.text1 || '';
+          text2.value = data.text2 || '';
+          text3.value = data.text3 || '';
+          updatePreview(data.bg || '');
+        }
+      } catch (_) {
+        bgUrl.value = ''; text1.value = ''; text2.value=''; text3.value=''; updatePreview('');
+      }
+    }
+
+    function resolveUrl(u) {
+      if (!u) return '';
+      let s = String(u).trim();
+      // strip wrapping quotes if pasted
+      if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+        s = s.slice(1, -1).trim();
+      }
+      if (!s) return '';
+      // Any absolute path should be served from our app base, not the file system root
+      if (s.startsWith('/')) return api(s);
+      if (s.startsWith('/uploads/')) return api(s);
+      if (/^https?:\/\//i.test(s) || /^data:/i.test(s) || /^file:\/\//i.test(s)) return s;
+      // Windows path pasted
+      if (/^[a-zA-Z]:\\/.test(s)) return '';
+      // If user typed just a filename (e.g., plan.jpg), assume it lives in indeximages/
+      if (!s.includes('/') && /\.(png|jpe?g|gif|webp)$/i.test(s)) {
+        s = `indeximages/${s}`;
+      }
+      // Encode spaces and unsafe characters for preview
+      try { return encodeURI(s); } catch(_) { return s; }
+    }
+    function updatePreview(url) {
+      const hint = document.getElementById('previewHint');
+      const resolved = resolveUrl(url);
+      if (!resolved) {
+        imgPreview.style.backgroundImage = 'none';
+        if (hint) hint.textContent = 'No preview. Use Upload or a valid http(s) URL.';
+        return;
+      }
+      const testImg = new Image();
+      testImg.onload = function() {
+        imgPreview.style.backgroundImage = `url('${resolved}')`;
+        if (hint) hint.textContent = 'Preview of background';
+      };
+      testImg.onerror = function() {
+        imgPreview.style.backgroundImage = 'none';
+        if (hint) hint.textContent = 'Could not load image. If you pasted a local path (e.g., C:\\...), please use Upload instead.';
+      };
+      testImg.src = resolved;
+    }
+
+    selPage.addEventListener('change', () => load(selPage.value));
+    indexSection.addEventListener('change', () => { if (selPage.value === 'index') load('index'); });
+    aboutSection.addEventListener('change', () => { if (selPage.value === 'about') load('about'); });
+    if (organizerSelect) organizerSelect.addEventListener('change', () => {
+      const opt = organizerSelect.options[organizerSelect.selectedIndex];
+      if (!opt) return;
+      text1.value = opt.dataset.name || '';
+      text2.value = opt.dataset.role || '';
+      bgUrl.value = opt.dataset.bg || '';
+      updatePreview(bgUrl.value);
+    });
+    if (organizerNewBtn) organizerNewBtn.addEventListener('click', () => {
+      text1.value = '';
+      text2.value = '';
+      bgUrl.value = '';
+      updatePreview('');
+      if (organizerSelect) organizerSelect.selectedIndex = -1;
+    });
+    let isOrganizerSaving = false;
+    if (organizerSaveBtn) organizerSaveBtn.addEventListener('click', async () => {
+      if (isOrganizerSaving) return;
+      isOrganizerSaving = true;
+      try {
+        organizerSaveBtn.disabled = true;
+        const name = (text1.value || '').trim();
+        const role = (text2.value || '').trim();
+        const bg = (bgUrl.value || '').trim();
+        if (!name) { notifyError('Name is required'); return; }
+
+        // Determine if this should be an update by:
+        // 1) selected option id, else 2) matching existing name (case-insensitive)
+        let targetId = null;
+        const selected = organizerSelect && organizerSelect.selectedIndex >= 0 ? organizerSelect.options[organizerSelect.selectedIndex] : null;
+        if (selected && selected.value) {
+          targetId = String(selected.value).trim();
+        } else if (organizerSelect) {
+          const options = Array.from(organizerSelect.options || []);
+          const match = options.find(o => (o.dataset && (o.dataset.name || '')).trim().toLowerCase() === name.toLowerCase());
+          if (match && match.value) targetId = String(match.value).trim();
+        }
+
+        const isUpdate = !!targetId;
+        const url = isUpdate ? api(`/api/organizers/${encodeURIComponent(targetId)}`) : api('/api/organizers');
+        const method = isUpdate ? 'PUT' : 'POST';
+        const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` }, body: JSON.stringify({ name, role, bg }) });
+        if (!r.ok) { notifyError('Save failed'); return; }
+
+        // If created, try to select the newly created organizer by id from response
+        try {
+          const j = await r.json();
+          const newId = (j && (j.id || (j.data && j.data.id))) ? String(j.id || j.data.id) : null;
+          await load('about');
+          if (newId && organizerSelect) {
+            const idx = Array.from(organizerSelect.options).findIndex(o => String(o.value) === newId);
+            if (idx >= 0) organizerSelect.selectedIndex = idx;
+          }
+        } catch (_) {
+          await load('about');
+        }
+        notifySuccess('Organizer saved.');
+      } finally {
+        isOrganizerSaving = false;
+        organizerSaveBtn.disabled = false;
+      }
+    });
+    
+
+    if (organizerDeleteBtn) organizerDeleteBtn.addEventListener('click', async () => {
+      const selected = organizerSelect && organizerSelect.selectedIndex >= 0 ? organizerSelect.options[organizerSelect.selectedIndex] : null;
+      if (!selected || !selected.value) { notifyError('Select an organizer to delete.'); return; }
+      const id = parseInt(String(selected.value).trim(), 10);
+      if (!Number.isFinite(id) || id <= 0) { notifyError('Invalid organizer id. Try reloading the page.'); return; }
+      const proceed = await confirmAction('Delete this organizer?');
+      if (!proceed) return;
+      try {
+        const resp = await fetch(api(`/api/organizers/${id}?hard=1`), { method: 'DELETE', headers: { 'Authorization': `Bearer ${getToken()}` } });
+        if (resp.status === 401) { notifyError('Unauthorized. Please log in as admin.'); return; }
+        if (resp.status === 404) {
+          // Fallback: try delete by name (case-insensitive)
+          const name = selected.dataset && selected.dataset.name ? selected.dataset.name : '';
+          if (name) {
+            const byName = await fetch(api('/api/organizers/by-name?hard=1'), { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` }, body: JSON.stringify({ name }) });
+            if (byName.ok) {
+              await load('about');
+              notifySuccess('Organizer deleted by name.');
+              return;
+            }
+          }
+        }
+        if (!resp.ok) {
+          let msg = 'Delete failed';
+          try { const j = await resp.json(); if (j && j.error) msg = `Delete failed: ${j.error}`; } catch (_) {}
+          notifyError(msg);
+          return;
+        }
+        await load('about');
+        notifySuccess('Organizer deleted.');
+      } catch (e) {
+        notifyError('Delete failed');
+      }
+    });
+
+    
+    
+    // Organizer add/delete controls were removed
+    slideSel.addEventListener('change', () => { if (selPage.value === 'index') load('index'); });
+    portfolioPhoto.addEventListener('change', () => { if (selPage.value === 'index') load('index'); });
+    finalSlide.addEventListener('change', () => { if (selPage.value === 'index') load('index'); });
+    if (servicesCardIndex) servicesCardIndex.addEventListener('change', () => { if (selPage.value === 'services') load('services'); });
+    bgUrl.addEventListener('input', () => updatePreview(bgUrl.value.trim()));
+
+    file.addEventListener('change', async () => {
+      const f = file.files && file.files[0];
+      if (!f) return;
+      if (!f.type.startsWith('image/')) { notifyError('Please select an image file.'); file.value=''; return; }
+      if (f.size > 15 * 1024 * 1024) { notifyError('Image too large (>15MB). Choose a smaller one.'); return; }
+      // Show an immediate local preview while upload/processing happens
+      let objectUrl = null;
+      try {
+        objectUrl = URL.createObjectURL(f);
+        updatePreview(objectUrl);
+      } catch(_) {}
+      // Try backend upload first; fallback to data URL
+      try {
+        const uploaded = await backendUpload(f);
+        if (uploaded) {
+          bgUrl.value = uploaded;
+          updatePreview(uploaded);
+          if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch(_) {} }
+          return;
+        }
+      } catch (e) {
+        notifyError('Upload failed on server. Falling back to local image.');
+      }
+      {
+        const reader = new FileReader();
+        reader.onload = e => {
+          bgUrl.value = String(e.target.result || '');
+          updatePreview(bgUrl.value);
+          if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch(_) {} }
+        };
+        reader.readAsDataURL(f);
+      }
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const page = selPage.value;
+      let data;
+      // Identify which section is being saved for clearer UX and to avoid confusion
+      const sectionLabel = (function(){
+        if (page === 'index') {
+          const sec = (indexSection && indexSection.value) || '';
+          if (sec === 'portfolio') return 'Portfolio Photo';
+          if (sec === 'finalSlide') return 'Final Slide';
+          return 'Slide';
+        }
+        if (page === 'global') return 'Hex Logo';
+        return page;
+      })();
+      if (page === 'about') {
+        // Merge backend and local copies so saving one section never erases others
+        let backendCurrent = await backendGet(page);
+        let localCurrent;
+        try { const raw = localStorage.getItem(storageKey(page)); localCurrent = raw ? JSON.parse(raw) : {}; } catch (_) { localCurrent = {}; }
+        // Make local changes take precedence over server values when saving,
+        // so offline edits/deletions don't get resurrected by older backend data
+        let current = Object.assign({}, (backendCurrent && typeof backendCurrent === 'object') ? backendCurrent : {}, (localCurrent && typeof localCurrent === 'object') ? localCurrent : {});
+        if (!current || typeof current !== 'object') current = {};
+        const selectedAboutSection = aboutSection.value;
+        if (selectedAboutSection === 'hero') {
+          current.hero = {
+            bg: bgUrl.value.trim() || '',
+            text1: text1.value.trim() || '',
+            text2: text2.value.trim() || '',
+            text3: text3.value.trim() || ''
+          };
+        } else if (selectedAboutSection === 'content') {
+          current.content = {
+            bg: bgUrl.value.trim() || '',
+            text1: text1.value.trim() || '',
+            text2: text2.value.trim() || '',
+            text3: text3.value.trim() || ''
+          };
+        } else if (selectedAboutSection === 'story') {
+          current.story = {
+            bg: bgUrl.value.trim() || '',
+            text1: text1.value.trim() || '',
+            text2: text2.value.trim() || '',
+            text3: text3.value.trim() || ''
+          };
+        } else if (selectedAboutSection === 'banner') {
+          current.banner = {
+            bg: bgUrl.value.trim() || '',
+            text1: text1.value.trim() || '',
+            text2: text2.value.trim() || '',
+            text3: text3.value.trim() || ''
+          };
+        } else if (selectedAboutSection === 'organizers') {
+          const idx = Math.max(0, organizerIndex || 0);
+          if (!current.organizers) current.organizers = [];
+          if (Array.isArray(current.organizers)) {
+            while (current.organizers.length <= idx) current.organizers.push({ bg:'', text1:'', text2:'' });
+            current.organizers[idx] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '' };
+          } else {
+            current.organizers = current.organizers || {};
+            current.organizers[String(idx)] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '' };
+          }
+        }
+        data = current;
+      } else if (page === 'index') {
+        // Merge into existing structure with slides/portfolio/final slides
+        let current = await backendGet(page);
+        if (!current) {
+          const raw = localStorage.getItem(storageKey(page));
+          current = raw ? JSON.parse(raw) : {};
+        }
+        if (!current || typeof current !== 'object') current = {};
+        const selectedSection = indexSection.value;
+        if (selectedSection === 'portfolio') {
+          const idx = parseInt(portfolioPhoto.value, 10) || 0;
+          if (!current.portfolio) current.portfolio = Array(6).fill(null).map(() => ({ bg:'', text1:'', text2:'', text3:'' }));
+          if (Array.isArray(current.portfolio)) {
+            current.portfolio[idx] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '', text3: text3.value.trim() || '' };
+          } else {
+            current.portfolio = current.portfolio || {};
+            current.portfolio[String(idx)] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '', text3: text3.value.trim() || '' };
+          }
+        } else if (selectedSection === 'finalSlide') {
+          const idx = parseInt(finalSlide.value, 10) || 0;
+          if (!current.finalSlides) current.finalSlides = Array(3).fill(null).map(() => ({ bg:'', text1:'', text2:'', text3:'' }));
+          if (Array.isArray(current.finalSlides)) {
+            current.finalSlides[idx] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '', text3: text3.value.trim() || '' };
+          } else {
+            current.finalSlides = current.finalSlides || {};
+            current.finalSlides[String(idx)] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '', text3: text3.value.trim() || '' };
+          }
+        } else {
+          const idx = parseInt(slideSel.value, 10) || 0;
+          if (!current.slides) current.slides = Array(3).fill(null).map(() => ({ bg:'', text1:'', text2:'', text3:'' }));
+          if (Array.isArray(current.slides)) {
+            current.slides[idx] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '', text3: text3.value.trim() || '' };
+          } else {
+            current.slides = current.slides || {};
+            current.slides[String(idx)] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '', text3: text3.value.trim() || '' };
+          }
+        }
+        data = current;
+      } else if (page === 'services') {
+        // Merge and save selected services card
+        let current = await backendGet(page);
+        if (!current) {
+          const raw = localStorage.getItem(storageKey(page));
+          current = raw ? JSON.parse(raw) : {};
+        }
+        if (!current || typeof current !== 'object') current = {};
+        const idx = parseInt(servicesCardIndex.value, 10) || 0;
+        if (!current.cards) current.cards = Array(8).fill(null).map(() => ({ bg:'', text1:'', text2:'' }));
+        if (Array.isArray(current.cards)) {
+          current.cards[idx] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '' };
+        } else {
+          current.cards = current.cards || {};
+          current.cards[String(idx)] = { bg: bgUrl.value.trim() || '', text1: text1.value.trim() || '', text2: text2.value.trim() || '' };
+        }
+        data = current;
+      } else if (page === 'global') {
+        // Store hex logo text + optional image URL + optional text color
+        data = {
+          hexLogoText: text1.value.trim() || '',
+          hexLogoBg: bgUrl.value.trim() || '',
+          hexLogoTextColor: hexTextColorInput ? (hexTextColorInput.value || '').trim() : ''
+        };
+      } else {
+        data = {
+          bg: bgUrl.value.trim() || '',
+          text1: text1.value.trim() || '',
+          text2: text2.value.trim() || '',
+          text3: text3.value.trim() || ''
+        };
+      }
+      // Ensure bgUrl has a value if a file is selected (upload it now if needed)
+      try {
+        if ((!bgUrl.value || !bgUrl.value.trim()) && file && file.files && file.files[0]) {
+          const uploadedNow = await backendUpload(file.files[0]);
+          if (uploadedNow) {
+            bgUrl.value = uploadedNow;
+          } else {
+            // fallback to data URL so at least the change persists locally
+            await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = e => { try { bgUrl.value = String(e.target.result || ''); } catch(_) {} resolve(); };
+              reader.onerror = () => resolve();
+              reader.readAsDataURL(file.files[0]);
+            });
+          }
+        }
+      } catch(_) {}
+      const ok = await backendSave(page, data);
+      try { localStorage.setItem(storageKey(page), JSON.stringify(data)); } catch (_) {}
+      if (ok) {
+        notifySuccess(`${sectionLabel} saved to server and local storage.`);
+      } else {
+        notifyError(`${sectionLabel} saved locally (server unavailable).`);
+      }
+      // Always reload current page state so switching sections right after a save works reliably
+      await load(page);
+    });
+
+    
+
+    clearBtn.addEventListener('click', async () => {
+      const page = selPage.value;
+      // Fine-grained clear for index sections; fallback to full page clear
+      if (page === 'index') {
+        const selectedSection = (indexSection && indexSection.value) || '';
+        try {
+          let current = await backendGet(page);
+          if (!current) {
+            const raw = localStorage.getItem(storageKey(page));
+            current = raw ? JSON.parse(raw) : {};
+          }
+          if (!current || typeof current !== 'object') current = {};
+          if (selectedSection === 'slide') {
+            const idx = parseInt(slideSel.value, 10) || 0;
+            if (!current.slides) current.slides = Array(3).fill(null).map(() => ({ bg:'', text1:'', text2:'', text3:'' }));
+            if (Array.isArray(current.slides)) {
+              current.slides[idx] = { bg:'', text1:'', text2:'', text3:'' };
+            } else {
+              current.slides = current.slides || {};
+              current.slides[String(idx)] = { bg:'', text1:'', text2:'', text3:'' };
+            }
+            await backendSave(page, current);
+            try { localStorage.setItem(storageKey(page), JSON.stringify(current)); } catch (_) {}
+            await load('index');
+            notifySuccess('Cleared Slides #' + (idx + 1));
+            return;
+          }
+          if (selectedSection === 'portfolio') {
+            const idx = parseInt(portfolioPhoto.value, 10) || 0;
+            if (!current.portfolio) current.portfolio = Array(6).fill(null).map(() => ({ bg:'', text1:'', text2:'', text3:'' }));
+            if (Array.isArray(current.portfolio)) {
+              current.portfolio[idx] = { bg:'', text1:'', text2:'', text3:'' };
+            } else {
+              current.portfolio = current.portfolio || {};
+              current.portfolio[String(idx)] = { bg:'', text1:'', text2:'', text3:'' };
+            }
+            await backendSave(page, current);
+            try { localStorage.setItem(storageKey(page), JSON.stringify(current)); } catch (_) {}
+            await load('index');
+            notifySuccess('Cleared Portfolio Photo #' + (idx + 1));
+            return;
+          }
+          if (selectedSection === 'finalSlide') {
+            const idx = parseInt(finalSlide.value, 10) || 0;
+            if (!current.finalSlides) current.finalSlides = Array(3).fill(null).map(() => ({ bg:'', text1:'', text2:'', text3:'' }));
+            if (Array.isArray(current.finalSlides)) {
+              current.finalSlides[idx] = { bg:'', text1:'', text2:'', text3:'' };
+            } else {
+              current.finalSlides = current.finalSlides || {};
+              current.finalSlides[String(idx)] = { bg:'', text1:'', text2:'', text3:'' };
+            }
+            await backendSave(page, current);
+            try { localStorage.setItem(storageKey(page), JSON.stringify(current)); } catch (_) {}
+            await load('index');
+            notifySuccess('Cleared Final Slide #' + (idx + 1));
+            return;
+          }
+        } catch (_) {}
+      }
+      // Fallback: clear entire page overrides
+      await backendClear(page);
+      try { localStorage.removeItem(storageKey(page)); } catch (_) {}
+      load(page);
+      notifySuccess('Cleared overrides for ' + page);
+    });
+
+    if (clearAllBtn) clearAllBtn.addEventListener('click', async () => {
+      const proceed = await confirmAction('Delete ALL page overrides (server and local)?');
+      if (!proceed) return;
+      try {
+        clearAllBtn.disabled = true;
+        const pages = ['index','contact','services','testimonials','about','packages','global'];
+        // Clear on server in parallel
+        await Promise.all(pages.map(p => backendClear(p)));
+        // Clear local storage
+        pages.forEach(p => { try { localStorage.removeItem(storageKey(p)); } catch(_) {} });
+        notifySuccess('Cleared overrides for all pages.');
+      } catch (_) {
+        notifyError('Failed to clear some overrides.');
+      } finally {
+        clearAllBtn.disabled = false;
+        await load(selPage.value);
+      }
+    });
+
+    // init
+    load(selPage.value);
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedbacks</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 0; background: #f1f5f9; color: #0f172a; }
+        .wrap { width: min(1100px, 100%); margin: 0 auto; padding: 16px; }
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+            border: 1px solid rgba(255,255,255,0.4); border-radius: 16px; backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .title { font-weight: 800; font-size: 22px; }
+        .actions { display: flex; gap: 10px; }
+        .btn { border: none; color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+            border: 1px solid rgba(255,255,255,0.4); border-radius: 16px; backdrop-filter: blur(20px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .list { padding: 16px; }
+        .pager { display:flex; justify-content:center; align-items:center; gap:8px; padding: 10px 16px 20px; }
+        .pager button { border:1px solid #cbd5e1; background:#fff; padding:6px 10px; border-radius:8px; cursor:pointer; }
+        .pager button[disabled] { opacity: .5; cursor: not-allowed; }
+        .pager .info { color:#475569; font-size: 13px; font-weight:600; }
+        .item {
+            border: 1px solid rgba(255,255,255,0.5); border-radius: 14px; padding: 18px; margin-bottom: 12px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.9));
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        .item.unread { background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(37,99,235,0.04)); }
+        .item-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .item-name { font-weight: 800; font-size: 18px; color: #0f172a; }
+        .item-meta { display: flex; align-items: center; gap: 10px; }
+        .date { font-size: 13px; color: #475569; font-weight: 600; }
+        .pill { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .item-body { color: #1e293b; line-height: 1.6; font-size: 15px; white-space: pre-wrap; }
+        .item-photo { margin-top: 12px; }
+        .item-photo img { max-width: 250px; max-height: 180px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .item-actions { display: flex; gap: 10px; margin-top: 12px; }
+        .btn-post { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-ghost { background: transparent; color: #334155; border: 2px solid rgba(51,65,85,0.2); }
+        .empty, .error, .loading { color: #475569; text-align: center; padding: 40px; font-size: 16px; font-weight: 500; }
+        @media (max-width: 480px) { .title { font-size: 18px; } .btn { padding: 8px 12px; font-size: 13px; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auth guard
+            try {
+                const token = localStorage.getItem('adminToken');
+                const expiry = parseInt(localStorage.getItem('adminTokenExpiry') || '0', 10);
+                if (!token || !expiry || Date.now() >= expiry) {
+                    window.top.location.href = 'admin.html';
+                    return;
+                }
+            } catch (_) {}
+
+            const listEl = document.getElementById('list');
+            const pagerEl = document.getElementById('pager');
+            const PAGE_SIZE = 5;
+            let allItems = [];
+            let currentPage = 1;
+            const markAllBtn = document.getElementById('mark-all');
+            const refreshBtn = document.getElementById('refresh');
+
+            function setLoading() { listEl.innerHTML = '<div class="loading">Loading feedback...</div>'; }
+            function setEmpty() { listEl.innerHTML = ''; }
+            function setError() { listEl.innerHTML = '<div class="error" style="color:#dc2626;">Error loading feedback. Please try again.</div>'; }
+
+            function fetchJson(url, opts) {
+                const headers = Object.assign({}, (opts && opts.headers) || {}, {
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                });
+                return fetch(url, Object.assign({}, opts, { headers })).then(r => r.ok ? r.json() : Promise.reject(new Error(r.status + ' ' + r.statusText)));
+            }
+
+            function render(items) {
+                if (!Array.isArray(items) || items.length === 0) { setEmpty(); pagerEl.innerHTML = ''; return; }
+
+                const total = items.length;
+                const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+                currentPage = Math.min(Math.max(1, currentPage), totalPages);
+                const start = (currentPage - 1) * PAGE_SIZE;
+                const pageSlice = items.slice(start, Math.min(start + PAGE_SIZE, total));
+
+                listEl.innerHTML = pageSlice.map(fb => {
+                    const created = fb.created_at ? new Date(fb.created_at).toLocaleString() : '';
+                    const email = fb.email ? ` · <span style=\"font-weight:600;color:#475569;\">${fb.email}</span>` : '';
+                    const unreadPill = !fb.is_read ? '<span class=\"pill\">NEW</span>' : '';
+                    const photo = fb.photo_path ? `<div class=\"item-photo\"><img src=\"http://localhost:5000${fb.photo_path}\" alt=\"Feedback photo\"></div>` : '';
+                    const canPost = !fb.is_posted;
+                    return `
+                    <div class=\"item ${fb.is_read ? '' : 'unread'}\">
+                        <div class=\"item-head\">
+                            <div class=\"item-name\">${fb.name || 'Anonymous'}${email}</div>
+                            <div class=\"item-meta\">
+                                <div class=\"date\">${created}</div>
+                                ${unreadPill}
+                            </div>
+                        </div>
+                        <div class=\"item-body\">${(fb.description || '').replace(/</g,'&lt;')}</div>
+                        ${photo}
+                        <div class=\"item-actions\">
+                            ${canPost ? `<button class=\"btn btn-post post-one\" data-id=\"${fb.id}\">Post to testimonials</button>` : ''}
+                            ${!fb.is_read ? `<button class=\"btn btn-success mark-one\" data-id=\"${fb.id}\">Mark as read</button>` : ''}
+                            <button class=\"btn btn-danger delete-one\" data-id=\"${fb.id}\">Delete</button>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                listEl.querySelectorAll('.mark-one').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        fetchJson(`http://localhost:5000/api/feedback/${id}/read`, { method: 'PUT' })
+                            .then(() => {
+                                load(false);
+                                Swal.fire({ icon: 'success', title: 'Marked as read', timer: 1200, showConfirmButton: false });
+                            })
+                            .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Error marking as read' }));
+                    });
+                });
+                listEl.querySelectorAll('.delete-one').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        Swal.fire({
+                            title: 'Delete this feedback?',
+                            text: 'This action cannot be undone.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Yes, delete it',
+                            cancelButtonText: 'Cancel'
+                        }).then(result => {
+                            if (!result.isConfirmed) return;
+                            fetchJson(`http://localhost:5000/api/feedback/${id}`, { method: 'DELETE' })
+                                .then(() => {
+                                    // after delete, keep same page if possible
+                                    if (allItems.length % PAGE_SIZE === 1 && currentPage > 1) currentPage -= 1;
+                                    load(false);
+                                    Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
+                                })
+                                .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Error deleting feedback' }));
+                        });
+                    });
+                });
+
+                listEl.querySelectorAll('.post-one').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        const original = this.textContent;
+                        this.disabled = true; this.textContent = 'Posting...';
+                        fetch('http://localhost:5000/api/testimonials/from-feedback', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ feedbackId: id })
+                        }).then(async r => {
+                            let payload = null; try { payload = await r.json(); } catch(_) {}
+                            if (!r.ok || (payload && payload.error)) {
+                                throw new Error(payload && payload.error ? payload.error : `HTTP ${r.status}`);
+                            }
+                            Swal.fire({ icon: 'success', title: 'Posted to testimonials', timer: 1400, showConfirmButton: false });
+                            // Optimistically remove the Post button
+                            this.closest('.item') && (this.closest('.item').querySelector('.post-one')?.remove());
+                        }).catch(err => {
+                            console.error('Post to testimonials error:', err);
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Error posting to testimonials: ' + (err && err.message ? err.message : 'Unknown error') });
+                        }).finally(() => { this.disabled = false; this.textContent = original; });
+                    });
+                });
+
+                // Render pager
+                const info = `<span class="info">Page ${currentPage} of ${totalPages} (${total} total)</span>`;
+                const prevBtn = `<button ${currentPage === 1 ? 'disabled' : ''} id="pg-prev">Prev</button>`;
+                const nextBtn = `<button ${currentPage === totalPages ? 'disabled' : ''} id="pg-next">Next</button>`;
+                pagerEl.innerHTML = `${prevBtn}${info}${nextBtn}`;
+                const prev = document.getElementById('pg-prev');
+                const next = document.getElementById('pg-next');
+                prev && prev.addEventListener('click', () => { currentPage = Math.max(1, currentPage - 1); render(allItems); });
+                next && next.addEventListener('click', () => { currentPage = Math.min(totalPages, currentPage + 1); render(allItems); });
+            }
+
+            function load(resetPage = true) {
+                setLoading();
+                fetchJson('http://localhost:5000/api/feedback')
+                    .then(data => {
+                        allItems = Array.isArray(data.feedback) ? data.feedback : [];
+                        if (resetPage) currentPage = 1;
+                        render(allItems);
+                    })
+                    .catch(setError);
+            }
+
+            markAllBtn && markAllBtn.addEventListener('click', function() {
+                fetchJson('http://localhost:5000/api/feedback/read-all', { method: 'PUT' })
+                    .then(() => {
+                        load();
+                        Swal.fire({ icon: 'success', title: 'All marked as read', timer: 1400, showConfirmButton: false });
+                    })
+                    .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Error marking all as read' }));
+            });
+
+            refreshBtn && refreshBtn.addEventListener('click', load);
+
+            load();
+        });
+    </script>
+</head>
+<body>
+    <div class="wrap">
+        <div class="toolbar">
+            <div class="title">Feedback</div>
+            <div class="actions">
+                <button id="mark-all" class="btn btn-success" type="button">Mark all as read</button>
+                <button id="refresh" class="btn btn-primary" type="button">Refresh</button>
+            </div>
+        </div>
+        <div class="panel">
+            <div id="list" class="list">
+                <div class="loading">Loading feedback...</div>
+            </div>
+            <div id="pager" class="pager"></div>
+        </div>
+    </div>
+</body>
+</html>
+
+ 

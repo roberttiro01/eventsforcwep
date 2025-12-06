@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Packages</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/packages.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+        
+        .modal-backdrop.show {
+            display: flex;
+        }
+        
+        .modal-box {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .package-info {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .package-name {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .package-price {
+            font-size: 1.4rem;
+            color: #b77a44;
+            font-weight: 500;
+        }
+        
+        .venue-options {
+            margin-bottom: 20px;
+        }
+        
+        .venue-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .venue-option:hover {
+            background: #f8f9fa;
+            border-color: #b77a44;
+        }
+        
+        .venue-option input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+        
+        .venue-option label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .booking-details {
+            margin-bottom: 20px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-field label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+        
+        .form-field input,
+        .form-field select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-field input:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: #b77a44;
+            box-shadow: 0 0 0 3px rgba(183, 122, 68, 0.1);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .modal-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        
+        .cancel-button {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .cancel-button:hover {
+            background: #5a6268;
+        }
+        
+        .confirm-button {
+            background: #b77a44;
+            color: white;
+        }
+        
+        .confirm-button:hover {
+            background: #9d6638;
+        }
+        
+        /* Error Modal Styles */
+        .error-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            padding: 20px;
+        }
+        
+        .error-modal.show {
+            display: flex;
+        }
+        
+        .error-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: errorModalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes errorModalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .error-modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .error-icon {
+            width: 32px;
+            height: 32px;
+            color: #dc3545;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        
+        .error-modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .error-modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .error-message {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .error-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .error-list li {
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            margin-bottom: 10px;
+            border-radius: 0 6px 6px 0;
+            font-size: 1rem;
+            color: #495057;
+        }
+        
+        .error-list li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .error-modal-footer {
+            text-align: right;
+        }
+        
+        .error-modal-close {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .error-modal-close:hover {
+            background: #c82333;
+        }
+        
+        .error-modal-close:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-box {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+        
+        /* Restore original layout: remove forced grid and width overrides */
+        /* Pagination */
+        .packages-pagination {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 10px;
+        }
+        .packages-pagination.show {
+            display: flex;
+        }
+        .packages-pagination.grid-inline {
+            grid-column: 1 / -1;
+            margin: 10px 0 0;
+        }
+
+        /* Centered bottom controls */
+        .bottom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 30px;
+        }
+        /* Prev/Next button colors */
+        #bottom-prev.package-button {
+            background: #6c757d;
+            color: #ffffff;
+            border-radius: 0;
+        }
+        #bottom-prev.package-button:hover {
+            background: #5a6268;
+        }
+        #bottom-next.package-button {
+            background: #b77a44;
+            color: #ffffff;
+            border-radius: 0;
+        }
+        #bottom-next.package-button:hover {
+            background: #9d6638;
+        }
+        .bottom-controls .package-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Information Bar -->
+    <div class="info-bar">
+        <div class="logo">
+            <div class="hex-logo">CWEP</div>
+        </div>
+        
+        <div class="contact-info">
+            <div class="info-item">
+                <div class="icon location-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 21c-4.418 0-8-5.373-8-10a8 8 0 1 1 16 0c0 4.627-3.582 10-8 10z"/>
+                        <circle cx="12" cy="11" r="3"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">KASADYA POBLACION CORDOVA</div>
+                    <div class="sub">CEBU</div>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="icon clock-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">OFFICE HOURS</div>
+                    <div class="sub">8:00AM-9:00PM</div>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="icon phone-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 3.09 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.05a2 2 0 0 1-.45 2.11l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.98.35 2 .59 3.05.72A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">09876356425</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-menu">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="about.html" class="nav-item">About Us</a>
+            <a href="services.html" class="nav-item">Services</a>
+            <a href="packages.html" class="nav-item active">Packages</a>
+            <a href="contact.html" class="nav-item">Contact</a>
+            <a href="testimonials.html" class="nav-item">Testimonials</a>
+            <a href="admin.html" class="nav-item">Log in as admin</a>
+        </div>
+        
+        <a href="book.html" class="book-button">Book</a>
+    </div>
+
+    <main class="packages-page">
+        <section class="packages-grid" id="packages-grid">
+            <!-- Package 1 -->
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">445K <span>Wedding Package 1</span></div>
+                    <div class="subtitle">PACKAGES • 100 PAX</div>
+                    <div class="venues">Waterfront Hotel, Bai Hotel, Summit Galleria Hotel, Montebello Villa Hotel</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            <li>Full Planning & Coordination</li>
+                            <li>Food and Venue for 100 pax</li>
+                            <li>One suite room for the bride (overnight)</li>
+                            <li>Wedding Apparels (rentals)</li>
+                            <li>Complete entourage attire</li>
+                            <li>30 pcs invitation cards</li>
+                            <li>Photo coverage with side (USB for final copy)</li>
+                            <li>Prenup photo, attire and styling</li>
+                            <li>Video coverage (USB final copy)</li>
+                            <li>Hair and make up (8 pax) with retouch</li>
+                            <li>Wedding cake (3 layers)</li>
+                            <li>Host & DJ, Sounds and lights</li>
+                            <li>Church & Reception decors</li>
+                            <li>Complete flower set</li>
+                            <li>White bridal car with flowers</li>
+                            <li>On the day coordinators</li>
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="indeximages/wed.jpg" alt="Package 1 preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(1, 'Wedding Package 1')">PACKAGE 1</button>
+                </footer>
+            </article>
+
+            <!-- Package 2 -->
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">395K <span>Wedding Package 2</span></div>
+                    <div class="subtitle">PACKAGES • 80 PAX</div>
+                    <div class="venues">Bayfront, Mandarin, Mezzo, Beverly View, Events Space</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            <li>Full Planning & Coordination</li>
+                            <li>Food and Venue for 80 pax</li>
+                            <li>Wedding Apparels (rentals)</li>
+                            <li>Complete entourage attire</li>
+                            <li>25 pcs invitation cards</li>
+                            <li>Photo coverage (USB for final copy)</li>
+                            <li>Video coverage (USB final copy)</li>
+                            <li>Hair and make up (6 pax) with retouch</li>
+                            <li>Wedding cake (2 layers)</li>
+                            <li>Host & DJ, Sounds and lights</li>
+                            <li>Church & Reception decors</li>
+                            <li>Complete flower set</li>
+                            <li>On the day coordinators</li>
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="indeximages/plan.jpg" alt="Package 2 preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(2, 'Wedding Package 2')">PACKAGE 2</button>
+                </footer>
+            </article>
+
+            <!-- Package 3 -->
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">295K <span>Wedding Package 3</span></div>
+                    <div class="subtitle">PACKAGES • 60 PAX</div>
+                    <div class="venues">Chateau De Busay (Includes back-up room)</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            <li>Full Planning & Coordination</li>
+                            <li>Food and Venue for 60 pax</li>
+                            <li>Wedding Apparels (rentals)</li>
+                            <li>Complete entourage attire</li>
+                            <li>20 pcs invitation cards</li>
+                            <li>Photo coverage (USB for final copy)</li>
+                            <li>Video coverage (USB final copy)</li>
+                            <li>Hair and make up (4 pax) with retouch</li>
+                            <li>Wedding cake (2 layers)</li>
+                            <li>Host & DJ, Sounds and lights</li>
+                            <li>Church & Reception decors</li>
+                            <li>Complete flower set</li>
+                            <li>On the day coordinators</li>
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="indeximages/happy.jpg" alt="Package 3 preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(3, 'Wedding Package 3')">PACKAGE 3</button>
+                </footer>
+            </article>
+
+            <!-- Package 4 -->
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">275K <span>Wedding Package 4</span></div>
+                    <div class="subtitle">PACKAGES • 50 PAX</div>
+                    <div class="venues">Bayfront, Mandarin, Mezzo, Beverly View, Events Space</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            <li>Full Planning & Coordination</li>
+                            <li>Food and Venue for 50 pax</li>
+                            <li>Wedding Apparels (rentals)</li>
+                            <li>Complete entourage attire</li>
+                            <li>15 pcs invitation cards</li>
+                            <li>Photo coverage (USB for final copy)</li>
+                            <li>Hair and make up (4 pax) with retouch</li>
+                            <li>Wedding cake (2 layers)</li>
+                            <li>Host & DJ, Sounds and lights</li>
+                            <li>Church & Reception decors</li>
+                            <li>Complete flower set</li>
+                            <li>On the day coordinators</li>
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="indeximages/smile.jpg" alt="Package 4 preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(4, 'Wedding Package 4')">PACKAGE 4</button>
+                </footer>
+            </article>
+
+            <!-- Package 5 -->
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">245K <span>Wedding Package 5</span></div>
+                    <div class="subtitle">PACKAGES • 40 PAX</div>
+                    <div class="venues">Bayfront, Mandarin, Mezzo, Beverly View, Events Space, Golden Prince, Paradise Pavilion, Gems Paradise</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            <li>Full Planning & Coordination</li>
+                            <li>Food and Venue for 40 pax</li>
+                            <li>Wedding Apparels (rentals)</li>
+                            <li>Complete entourage attire</li>
+                            <li>10 pcs invitation cards</li>
+                            <li>Photo coverage (USB for final copy)</li>
+                            <li>Hair and make up (3 pax) with retouch</li>
+                            <li>Wedding cake (1 layer)</li>
+                            <li>Host & DJ, Sounds and lights</li>
+                            <li>Church & Reception decors</li>
+                            <li>Complete flower set</li>
+                            <li>On the day coordinators</li>
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="indeximages/kiss.jpg" alt="Package 5 preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(5, 'Wedding Package 5')">PACKAGE 5</button>
+                </footer>
+            </article>
+
+            <!-- Package 6 -->
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">195K <span>Wedding Package 6</span></div>
+                    <div class="subtitle">PACKAGES • 30 PAX</div>
+                    <div class="venues">Bayfront, Mandarin, Mezzo, Beverly View, Events Space, Golden Prince, Paradise Pavilion</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            <li>Full Planning & Coordination</li>
+                            <li>Food and Venue for 30 pax</li>
+                            <li>Wedding Apparels (rentals)</li>
+                            <li>Complete entourage attire</li>
+                            <li>5 pcs invitation cards</li>
+                            <li>Photo coverage (USB for final copy)</li>
+                            <li>Hair and make up (2 pax) with retouch</li>
+                            <li>Wedding cake (1 layer)</li>
+                            <li>Host & DJ, Sounds and lights</li>
+                            <li>Church & Reception decors</li>
+                            <li>Complete flower set</li>
+                            <li>On the day coordinators</li>
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="indeximages/walk.jpg" alt="Package 6 preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(6, 'Wedding Package 6')">PACKAGE 6</button>
+                </footer>
+            </article>
+        </section>
+        
+    </main>
+
+    <!-- Venue Selection Modal -->
+    <div id="venue-modal" class="modal-backdrop" aria-hidden="true" role="dialog">
+        <div class="modal-box venue-modal-box">
+            <div class="package-info" id="package-info">
+                <div class="package-name" id="package-name"></div>
+                <div class="package-price" id="package-price"></div>
+            </div>
+            
+            <div class="venue-options" id="venue-options">
+                <!-- Venue options will be populated dynamically -->
+            </div>
+            
+            <div class="booking-details" id="booking-details">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" pattern="[a-zA-Z\s'-]+" title="Please enter only letters, spaces, hyphens, and apostrophes">
+                    </div>
+                    <div class="form-field">
+                        <label for="coupleName">Couple Name</label>
+                        <input type="text" id="coupleName" name="coupleName" pattern="[a-zA-Z\s'-]+" title="Please enter only letters, spaces, hyphens, and apostrophes">
+                    </div>
+                    <div class="form-field">
+                        <label for="time">Time</label>
+                        <input type="time" id="time" name="time">
+                    </div>
+                    <div class="form-field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="your@mail.com">
+                    </div>
+                    <div class="form-field">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date">
+                    </div>
+                    <div class="form-field">
+                        <label for="contactNumber">Contact Number</label>
+                        <input type="tel" id="contactNumber" name="contactNumber" inputmode="numeric" maxlength="11" pattern="^[0-9]{11}$" title="Please enter exactly 11 digits" placeholder="e.g. 09871234567">
+                    </div>
+                    <div class="form-field">
+                        <label for="theme">Theme</label>
+                        <input type="text" id="theme" name="theme" placeholder="e.g. colors" pattern="[a-zA-Z\s'-]+" title="Please enter only letters, spaces, hyphens, and apostrophes">
+                    </div>
+                    <div class="form-field">
+                        <label for="guestCount">Number of Guests</label>
+                        <input type="number" id="guestCount" name="guestCount" min="1" step="1">
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="budget">Budget</label>
+                        <input type="number" id="budget" name="budget" min="0" step="0.01" placeholder="e.g. 50000.00" readonly title="Auto-filled from package price">
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="downpayment">Downpayment <span style="color: red;">*</span></label>
+                        <input type="number" id="downpayment" name="downpayment" min="0" step="0.01" placeholder="e.g. 10000.00" required>
+                        <small style="color: #666; font-size: 0.9rem; margin-top: 4px; display: block;">
+                            Required to proceed with booking and payment
+                        </small>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="cancel-venue" class="modal-button cancel-button" type="button">Cancel</button>
+                <button id="send-otp" class="modal-button confirm-button" type="button">Get Code</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div id="otp-modal" class="modal-backdrop" aria-hidden="true" role="dialog">
+        <div class="modal-box">
+            <div class="package-info">
+                <div class="package-name">Verify Your Package Booking</div>
+                <div class="package-price" style="color: #666; font-size: 1rem;">Enter the 6-digit code sent to your email</div>
+            </div>
+            
+            <div class="booking-details">
+                <div class="form-field" style="max-width: 300px; margin: 0 auto;">
+                    <label for="otp-code">Verification Code</label>
+                    <input type="text" id="otp-code" name="otp-code" maxlength="6" pattern="[0-9]{6}" title="Please enter the 6-digit code" placeholder="000000" style="text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: bold;">
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <p style="color: #666; font-size: 14px;">Didn't receive the code? <button type="button" id="resend-otp" style="background: none; border: none; color: #b77a44; text-decoration: underline; cursor: pointer;">Resend Code</button></p>
+                    <p id="otp-timer" style="color:#b77a44; font-weight:600; margin-top:8px;">Code expires in 10:00</p>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="cancel-otp" class="modal-button cancel-button" type="button">Cancel</button>
+                <button id="verify-otp" class="modal-button confirm-button" type="button">Verify & Book</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="error-modal" aria-hidden="true" role="dialog" aria-labelledby="error-modal-title">
+        <div class="error-modal-content">
+            <div class="error-modal-header">
+                <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+                <h3 id="error-modal-title" class="error-modal-title">Required Fields Missing</h3>
+            </div>
+            <div class="error-modal-body">
+                <p class="error-message">Please fill in all required fields before proceeding to payment:</p>
+                <ul id="error-list" class="error-list">
+                    <!-- Error items will be populated dynamically -->
+                </ul>
+            </div>
+            <div class="error-modal-footer">
+                <button id="error-modal-close" class="error-modal-close" type="button">OK, Got It</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Package venue mappings
+        const packageVenues = {
+            1: [
+                'Waterfront Hotel',
+                'Bai Hotel', 
+                'Summit Galleria Hotel',
+                'Montebello Villa Hotel'
+            ],
+            2: [
+                'Bayfront',
+                'Mandarin',
+                'Mezzo',
+                'Beverly View',
+                'Events Space'
+            ],
+            3: [
+                'Chateau De Busay (Includes back-up room)'
+            ],
+            4: [
+                'Bayfront',
+                'Mandarin',
+                'Mezzo',
+                'Beverly View',
+                'Events Space'
+            ],
+            5: [
+                'Bayfront',
+                'Mandarin',
+                'Mezzo',
+                'Beverly View',
+                'Events Space',
+                'Golden Prince',
+                'Paradise Pavilion',
+                'Gems Paradise'
+            ],
+            6: [
+                'Bayfront',
+                'Mandarin',
+                'Mezzo',
+                'Beverly View',
+                'Events Space',
+                'Golden Prince',
+                'Paradise Pavilion'
+            ]
+        };
+
+        // Package price mappings
+        const packagePrices = {
+            1: '445K',
+            2: '395K',
+            3: '295K',
+            4: '275K',
+            5: '245K',
+            6: '195K'
+        };
+
+        let selectedPackageId = null;
+        let selectedPackageTitle = null;
+        let selectedVenue = null;
+
+        // Dynamically fetch and render packages from API (fallback to static if API fails)
+        const PAGE_SIZE = 6;
+        let dynamicPackagesCache = [];
+        let currentPage = 1;
+
+        function renderPage(page) {
+            const grid = document.getElementById('packages-grid');
+            const bottomPrevBtn = document.getElementById('bottom-prev');
+            const bottomNextBtn = document.getElementById('bottom-next');
+            if (!grid) return;
+
+            // Build cache from static cards if dynamic data isn't available
+            if (!Array.isArray(dynamicPackagesCache) || dynamicPackagesCache.length === 0) {
+                const staticCards = Array.from(grid.querySelectorAll('.package-card'));
+                if (staticCards.length > 0) {
+                    dynamicPackagesCache = staticCards.map(card => ({ html: card.outerHTML }));
+                }
+            }
+
+            if (!Array.isArray(dynamicPackagesCache) || dynamicPackagesCache.length === 0) {
+                if (bottomPrevBtn) bottomPrevBtn.disabled = true;
+                if (bottomNextBtn) bottomNextBtn.disabled = true;
+                return;
+            }
+
+            const total = dynamicPackagesCache.length;
+            const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+            currentPage = Math.min(Math.max(1, page), totalPages);
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = Math.min(start + PAGE_SIZE, total);
+            const slice = dynamicPackagesCache.slice(start, end);
+
+            const fragments = [];
+            slice.forEach((entry) => {
+                fragments.push(entry.html);
+            });
+            grid.innerHTML = fragments.join('\n');
+
+            // Update bottom controls disabled states
+            if (bottomPrevBtn) bottomPrevBtn.disabled = currentPage <= 1;
+            if (bottomNextBtn) bottomNextBtn.disabled = currentPage >= totalPages;
+        }
+
+        async function fetchAndRenderPackages() {
+            try {
+                const candidateOrigins = [];
+                if (window.location && window.location.origin && window.location.origin.startsWith('http')) {
+                    candidateOrigins.push(window.location.origin);
+                }
+                candidateOrigins.push('http://localhost:5000');
+                candidateOrigins.push('http://localhost:4400');
+
+                let data = null;
+                let activeOrigin = null;
+                for (let i = 0; i < candidateOrigins.length; i++) {
+                    try {
+                        const res = await fetch(`${candidateOrigins[i]}/api/packages/active`, { headers: { 'Accept': 'application/json' } });
+                        if (res.ok) {
+                            const json = await res.json();
+                            if (json && Array.isArray(json.packages) && json.packages.length > 0) {
+                                data = json;
+                                activeOrigin = candidateOrigins[i];
+                                break;
+                            }
+                        }
+                    } catch (_) { /* try next origin */ }
+                }
+                if (!data) return; // keep static content if all attempts fail
+
+                const grid = document.getElementById('packages-grid');
+                if (!grid) return;
+
+                const fallbackImages = [
+                    'indeximages/wed.jpg',
+                    'indeximages/plan.jpg',
+                    'indeximages/happy.jpg',
+                    'indeximages/smile.jpg',
+                    'indeximages/kiss.jpg',
+                    'indeximages/walk.jpg'
+                ];
+
+                function formatPriceLabel(value) {
+                    const num = Number(value);
+                    if (!isFinite(num) || num <= 0) return String(value);
+                    if (num >= 1000000 && num % 1000000 === 0) return `${Math.round(num / 1000000)}M`;
+                    if (num >= 1000 && num % 1000 === 0) return `${Math.round(num / 1000)}K`;
+                    return num.toLocaleString();
+                }
+
+                // Derive package numbers from title and sort accordingly
+                function extractPackageNumber(txt) {
+                    if (!txt) return null;
+                    const m = String(txt).match(/package\s*(\d+)/i);
+                    return m ? parseInt(m[1], 10) : null;
+                }
+                const packagesSorted = [...data.packages].map(p => ({ ...p, __pkgNum: extractPackageNumber(p.title || p.name) }))
+                    .sort((a, b) => {
+                        const an = a.__pkgNum, bn = b.__pkgNum;
+                        if (an !== null && bn !== null) return an - bn;
+                        if (an !== null) return -1;
+                        if (bn !== null) return 1;
+                        return 0;
+                    });
+
+                const entries = [];
+                packagesSorted.forEach((pkg, idx) => {
+                    const id = pkg.id || (1000 + idx);
+                    const displayNumber = (pkg.__pkgNum !== null && pkg.__pkgNum !== undefined) ? pkg.__pkgNum : (idx + 1);
+                    const title = pkg.title || pkg.name || `Package ${id}`;
+                    // Normalize display title: ensure "Wedding Package N" format when a number is present
+                    const displayTitle = (pkg.__pkgNum !== null && pkg.__pkgNum !== undefined)
+                        ? `Wedding Package ${pkg.__pkgNum}`
+                        : title;
+                    const pax = pkg.pax || pkg.pax_count || '';
+                    const priceNum = pkg.price;
+                    const priceLabel = formatPriceLabel(priceNum);
+                    let venuesArr = [];
+                    try {
+                        if (Array.isArray(pkg.venues)) venuesArr = pkg.venues;
+                        else if (typeof pkg.venues === 'string' && pkg.venues.trim().length) venuesArr = JSON.parse(pkg.venues);
+                    } catch (_) {}
+                    if (!Array.isArray(venuesArr)) venuesArr = [];
+                    const venuesText = venuesArr.join(', ');
+
+                    let inclusionsArr = [];
+                    try {
+                        if (Array.isArray(pkg.inclusions)) inclusionsArr = pkg.inclusions;
+                        else if (typeof pkg.inclusions === 'string' && pkg.inclusions.trim().length) inclusionsArr = JSON.parse(pkg.inclusions);
+                    } catch (_) {}
+                    if (!Array.isArray(inclusionsArr)) inclusionsArr = [];
+
+                    let imageUrl = pkg.image_url || fallbackImages[idx % fallbackImages.length];
+                    // If API returns a relative image path, prefix with the working origin
+                    if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+                        if (imageUrl.startsWith('/')) {
+                            if (activeOrigin) imageUrl = `${activeOrigin}${imageUrl}`;
+                        } else if (activeOrigin) {
+                            imageUrl = `${activeOrigin}/${imageUrl}`;
+                        }
+                    }
+
+                    // Update modal mappings so selection works with dynamic packages
+                    if (venuesArr.length > 0) {
+                        packageVenues[id] = venuesArr;
+                    }
+                    packagePrices[id] = priceLabel;
+
+                    const inclusionsHtml = inclusionsArr.length > 0
+                        ? inclusionsArr.map(item => `<li>${item}</li>`).join('')
+                        : '';
+
+                    const paxLabel = pax ? `PACKAGES • ${pax} PAX` : 'PACKAGES';
+
+                    const cardHtml = `
+            <article class="package-card">
+                <header class="package-header">
+                    <div class="price">${priceLabel} <span>${displayTitle}</span></div>
+                    <div class="subtitle">${paxLabel}</div>
+                    <div class="venues">${venuesText}</div>
+                </header>
+                <div class="package-body">
+                    <div class="inclusions">
+                        <h3>Inclusions:</h3>
+                        <ul>
+                            ${inclusionsHtml}
+                        </ul>
+                    </div>
+                    <div class="preview">
+                        <img src="${imageUrl}" alt="${title} preview">
+                    </div>
+                </div>
+                <footer class="package-footer">
+                    <button class="package-button" onclick="selectPackage(${id}, '${displayTitle.replace(/'/g, "&#39;")}')">PACKAGE ${displayNumber}</button>
+                </footer>
+            </article>`;
+
+                    entries.push({ id, html: cardHtml });
+                });
+
+                // Cache and render first page
+                dynamicPackagesCache = entries;
+                renderPage(1);
+            } catch (_) {
+                // Silent fallback to static
+            }
+        }
+
+        // Function to handle package selection
+        function selectPackage(packageId, packageTitle) {
+            console.log('Package selected:', { id: packageId, title: packageTitle });
+            
+            selectedPackageId = packageId;
+            selectedPackageTitle = packageTitle;
+            
+            // Show venue selection modal
+            showVenueModal(packageId);
+        }
+
+        // Function to show venue selection modal
+        function showVenueModal(packageId) {
+            const modal = document.getElementById('venue-modal');
+            const venueOptions = document.getElementById('venue-options');
+            const packageName = document.getElementById('package-name');
+            const packagePrice = document.getElementById('package-price');
+            const budgetInput = document.getElementById('budget');
+            
+            // Clear previous options
+            venueOptions.innerHTML = '';
+            
+            // Set package name and price
+            packageName.textContent = selectedPackageTitle;
+            packagePrice.textContent = packagePrices[packageId] || '';
+
+            // Autofill budget field from price
+            if (budgetInput) {
+                const priceLabel = packagePrices[packageId] || '';
+                let numericPrice = '';
+                if (typeof priceLabel === 'string') {
+                    const trimmed = priceLabel.trim().toUpperCase();
+                    // Convert values like "445K" -> 445000
+                    if (trimmed.endsWith('K')) {
+                        const base = parseFloat(trimmed.replace('K', ''));
+                        if (!isNaN(base)) numericPrice = Math.round(base * 1000);
+                    } else if (trimmed.endsWith('M')) { // future-proof
+                        const base = parseFloat(trimmed.replace('M', ''));
+                        if (!isNaN(base)) numericPrice = Math.round(base * 1000000);
+                    } else {
+                        const base = parseFloat(trimmed.replace(/[^0-9.]/g, ''));
+                        if (!isNaN(base)) numericPrice = base;
+                    }
+                }
+                if (numericPrice !== '') {
+                    budgetInput.value = numericPrice;
+                }
+            }
+            
+            // Get venues for this package
+            const venues = packageVenues[packageId] || [];
+            
+            // Create venue option buttons
+            venues.forEach((venue, index) => {
+                const venueOption = document.createElement('div');
+                venueOption.className = 'venue-option';
+                venueOption.innerHTML = `
+                    <input type="radio" id="venue-${index}" name="venue" value="${venue}">
+                    <label for="venue-${index}">${venue}</label>
+                `;
+                venueOptions.appendChild(venueOption);
+            });
+            
+            // Add event listeners to venue options
+            const venueInputs = venueOptions.querySelectorAll('input[name="venue"]');
+            venueInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    selectedVenue = this.value;
+                });
+            });
+            
+            // Show modal
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        // Function to close venue modal
+        function closeVenueModal(resetSelections = true) {
+            const modal = document.getElementById('venue-modal');
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            
+            // Only reset selections if explicitly requested (not when proceeding to OTP)
+            if (resetSelections) {
+                selectedPackageId = null;
+                selectedPackageTitle = null;
+                selectedVenue = null;
+            }
+        }
+
+        function showErrorModal(errors) {
+            const modal = document.getElementById('error-modal');
+            const errorList = document.getElementById('error-list');
+            
+            if (modal && errorList) {
+                // Clear previous errors
+                errorList.innerHTML = '';
+                
+                // Add new error items
+                errors.forEach(error => {
+                    const li = document.createElement('li');
+                    li.textContent = error;
+                    errorList.appendChild(li);
+                });
+                
+                // Show modal
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+                
+                // Focus on close button for accessibility
+                const closeBtn = document.getElementById('error-modal-close');
+                if (closeBtn) {
+                    setTimeout(() => closeBtn.focus(), 100);
+                }
+            }
+        }
+
+        function hideErrorModal() {
+            const modal = document.getElementById('error-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        // OTP Modal Functions
+        function showOtpModal() {
+            const modal = document.getElementById('otp-modal');
+            if (modal) {
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden', 'false');
+                // Focus on OTP input
+                const otpInput = document.getElementById('otp-code');
+                if (otpInput) {
+                    setTimeout(() => otpInput.focus(), 100);
+                }
+            }
+        }
+
+        function closeOtpModal() {
+            const modal = document.getElementById('otp-modal');
+            if (modal) {
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden', 'true');
+                // Clear OTP input
+                const otpInput = document.getElementById('otp-code');
+                if (otpInput) {
+                    otpInput.value = '';
+                }
+            }
+        }
+
+        // Store booking data for OTP verification
+        let otpBookingData = null;
+        let otpCountdownInterval = null;
+        let otpExpiresAtMs = null;
+        function formatSeconds(total) {
+            const m = Math.floor(total / 60);
+            const s = total % 60;
+            return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        function startOtpCountdown(ttlSeconds) {
+            const verifyBtn = document.getElementById('verify-otp');
+            const timerEl = document.getElementById('otp-timer');
+            if (!timerEl) return;
+            if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+            const now = Date.now();
+            otpExpiresAtMs = now + (Math.max(1, Number(ttlSeconds || 600)) * 1000);
+            function tick() {
+                const remainingMs = Math.max(0, otpExpiresAtMs - Date.now());
+                const remainingSec = Math.floor(remainingMs / 1000);
+                timerEl.textContent = `Code expires in ${formatSeconds(remainingSec)}`;
+                const expired = remainingSec <= 0;
+                if (verifyBtn) verifyBtn.disabled = expired;
+                if (expired) clearInterval(otpCountdownInterval);
+            }
+            tick();
+            otpCountdownInterval = setInterval(tick, 1000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize first page from static content so buttons work immediately
+            renderPage(1);
+            // Then try to replace with dynamic packages from API
+            fetchAndRenderPackages();
+
+            // Wire up bottom pagination controls
+            const bottomPrev = document.getElementById('bottom-prev');
+            const bottomNext = document.getElementById('bottom-next');
+            if (bottomPrev) bottomPrev.addEventListener('click', function() { renderPage(currentPage - 1); });
+            if (bottomNext) bottomNext.addEventListener('click', function() { renderPage(currentPage + 1); });
+
+            // Pagination controls removed per request
+            const cancelBtn = document.getElementById('cancel-venue');
+            const sendVerificationBtn = document.getElementById('send-otp');
+            const fullNameInput = document.getElementById('fullName');
+            const coupleNameInput = document.getElementById('coupleName');
+            const contactNumberInput = document.getElementById('contactNumber');
+            const themeInput = document.getElementById('theme');
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    closeVenueModal();
+                });
+            }
+
+            
+            // Restrict Full Name input to letters, spaces, hyphens, and apostrophes
+            if (fullNameInput) {
+                fullNameInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z\s'-]/g, '');
+                });
+                fullNameInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleaned = paste.replace(/[^a-zA-Z\s'-]/g, '');
+                    e.target.value = cleaned;
+                });
+            }
+
+            // Restrict Couple Name input to letters, spaces, hyphens, and apostrophes
+            if (coupleNameInput) {
+                coupleNameInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z\s'-]/g, '');
+                });
+                coupleNameInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleaned = paste.replace(/[^a-zA-Z\s'-]/g, '');
+                    e.target.value = cleaned;
+                });
+            }
+
+            // Restrict Contact Number to digits only and max 11 characters
+            if (contactNumberInput) {
+                contactNumberInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+                });
+                contactNumberInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleaned = paste.replace(/[^0-9]/g, '').slice(0, 11);
+                    e.target.value = cleaned;
+                });
+            }
+
+            // Restrict Theme input to letters, spaces, hyphens, and apostrophes
+            if (themeInput) {
+                themeInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z\s'-]/g, '');
+                });
+                themeInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleaned = paste.replace(/[^a-zA-Z\s'-]/g, '');
+                    e.target.value = cleaned;
+                });
+            }
+
+            function buildPayload() {
+                const fullNameVal = document.getElementById('fullName')?.value?.trim() || '';
+                const coupleNameVal = document.getElementById('coupleName')?.value?.trim() || '';
+                const emailVal = document.getElementById('email')?.value?.trim() || '';
+                const timeVal = document.getElementById('time')?.value || '';
+                const dateVal = document.getElementById('date')?.value || '';
+                const contactVal = document.getElementById('contactNumber')?.value?.trim() || '';
+                const themeVal = document.getElementById('theme')?.value?.trim() || '';
+                const guestsVal = document.getElementById('guestCount')?.value || '';
+                const budgetVal = document.getElementById('budget')?.value || '';
+                const downVal = document.getElementById('downpayment')?.value || '';
+                return { fullNameVal, coupleNameVal, emailVal, timeVal, dateVal, contactVal, themeVal, guestsVal, budgetVal, downVal };
+            }
+
+            function validateInputsForVerification() {
+                const { fullNameVal, emailVal, timeVal, dateVal, contactVal, themeVal, guestsVal, budgetVal, downVal } = buildPayload();
+                const requiredFields = [
+                    { value: fullNameVal, name: 'Full Name' },
+                    { value: emailVal, name: 'Email' },
+                    { value: timeVal, name: 'Time' },
+                    { value: dateVal, name: 'Date' },
+                    { value: contactVal, name: 'Contact Number' },
+                    { value: themeVal, name: 'Theme' },
+                    { value: guestsVal, name: 'Number of Guests' },
+                    { value: budgetVal, name: 'Budget' },
+                    { value: downVal, name: 'Downpayment' },
+                    { value: selectedVenue, name: 'Venue' }
+                ];
+                const missingFields = requiredFields.filter(field => !field.value).map(field => field.name);
+                if (String(contactVal).length !== 11) missingFields.push('Contact Number (must be exactly 11 digits)');
+                if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) missingFields.push('Email (must be a valid email address)');
+                if (downVal && parseFloat(downVal) <= 0) missingFields.push('Downpayment (must be greater than 0)');
+                if (guestsVal && parseInt(guestsVal) <= 0) missingFields.push('Number of Guests (must be greater than 0)');
+                
+                // Additional validation: Ensure downpayment is provided and valid
+                if (!downVal || downVal.trim() === '') {
+                    missingFields.push('Downpayment (required to proceed with booking)');
+                } else if (parseFloat(downVal) <= 0) {
+                    missingFields.push('Downpayment (must be greater than 0)');
+                }
+                
+                return { missingFields };
+            }
+
+
+            if (sendVerificationBtn) {
+                sendVerificationBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const { fullNameVal, coupleNameVal, emailVal, timeVal, dateVal, contactVal, themeVal, guestsVal, budgetVal, downVal } = buildPayload();
+                    const { missingFields } = validateInputsForVerification();
+                    if (missingFields.length > 0) { showErrorModal(missingFields); return; }
+                    const payload = {
+                        fullname: fullNameVal,
+                        couplename: coupleNameVal,
+                        email: emailVal,
+                        reception: selectedVenue,
+                        eventtype: selectedPackageTitle || '',
+                        theme: themeVal,
+                        time: timeVal,
+                        date: dateVal,
+                        budget: budgetVal,
+                        downpayment: downVal,
+                        contact: contactVal,
+                        guests: guestsVal,
+                        paymentmethod: 'package-downpayment'
+                    };
+                    try {
+                        const res = await fetch('http://localhost:4400/book/package-otp', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                        });
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({ error: 'Failed to send OTP code' }));
+                            showErrorModal([err.error || 'Failed to send OTP code']);
+                            return;
+                        }
+                        // Close venue modal and show OTP modal (don't reset selections yet)
+                        closeVenueModal(false);
+                        showOtpModal();
+                        // Start countdown (default 10 minutes, or use server-provided ttlSeconds)
+                        let ttlSeconds = 600;
+                        try {
+                            const body = await res.json();
+                            if (body && typeof body.ttlSeconds === 'number') ttlSeconds = body.ttlSeconds;
+                        } catch(_) { /* ignore */ }
+                        startOtpCountdown(ttlSeconds);
+                    } catch (_) {
+                        showErrorModal(['Unable to contact OTP service. Please try again.']);
+                    }
+                });
+            }
+
+            
+            // Intentionally no click handler for Next Package button
+
+            // Close modal when clicking outside
+            const modal = document.getElementById('venue-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) closeVenueModal();
+                });
+            }
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeVenueModal();
+                    closeOtpModal();
+                    hideErrorModal();
+                }
+            });
+
+            // Error modal event listeners
+            const errorModalCloseBtn = document.getElementById('error-modal-close');
+            const errorModal = document.getElementById('error-modal');
+            
+            if (errorModalCloseBtn) {
+                errorModalCloseBtn.addEventListener('click', hideErrorModal);
+            }
+            
+            if (errorModal) {
+                errorModal.addEventListener('click', function(e) {
+                    if (e.target === errorModal) {
+                        hideErrorModal();
+                    }
+                });
+            }
+
+            // OTP Modal event listeners
+            const otpModal = document.getElementById('otp-modal');
+            const cancelOtpBtn = document.getElementById('cancel-otp');
+            const verifyOtpBtn = document.getElementById('verify-otp');
+            const resendOtpBtn = document.getElementById('resend-otp');
+            const otpCodeInput = document.getElementById('otp-code');
+
+            if (cancelOtpBtn) {
+                cancelOtpBtn.addEventListener('click', closeOtpModal);
+            }
+
+            if (otpModal) {
+                otpModal.addEventListener('click', function(e) {
+                    if (e.target === otpModal) {
+                        closeOtpModal();
+                    }
+                });
+            }
+
+            // OTP input validation - only allow numbers
+            if (otpCodeInput) {
+                otpCodeInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                });
+                otpCodeInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleaned = paste.replace(/[^0-9]/g, '').slice(0, 6);
+                    e.target.value = cleaned;
+                });
+            }
+
+            // Verify OTP
+            if (verifyOtpBtn) {
+                verifyOtpBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const otpCode = document.getElementById('otp-code')?.value?.trim() || '';
+                    const email = document.getElementById('email')?.value?.trim() || '';
+                    
+                    if (!otpCode || otpCode.length !== 6) {
+                        showErrorModal(['Please enter a valid 6-digit verification code']);
+                        return;
+                    }
+
+                    if (!email) {
+                        showErrorModal(['Email address is required for verification']);
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch('http://localhost:4400/book/package-otp/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, code: otpCode })
+                        });
+
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({ error: 'OTP verification failed' }));
+                            showErrorModal([err.error || 'OTP verification failed']);
+                            return;
+                        }
+
+                        const result = await res.json();
+                        if (result.ok && result.verified) {
+                            // OTP verified successfully - show success message and redirect to payment
+                            closeOtpModal();
+                            
+                            // Show success message (SweetAlert2)
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'OTP verified!',
+                                    text: 'Redirecting to payment page...',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            }
+                            
+                            // Get booking data for payment page
+                            const { fullNameVal, coupleNameVal, emailVal, timeVal, dateVal, contactVal, themeVal, guestsVal, budgetVal, downVal } = buildPayload();
+                            
+                            // Validate that downpayment amount is provided and greater than 0
+                            if (!downVal || parseFloat(downVal) <= 0) {
+                                showErrorModal(['Downpayment amount is required and must be greater than 0 to proceed with payment.']);
+                                return;
+                            }
+                            
+                            // Store booking data in sessionStorage for payment page to use
+                            const bookingData = {
+                                fullname: fullNameVal,
+                                couplename: coupleNameVal,
+                                email: emailVal,
+                                reception: selectedVenue,
+                                eventtype: selectedPackageTitle || '',
+                                theme: themeVal,
+                                time: timeVal,
+                                date: dateVal,
+                                budget: budgetVal,
+                                downpayment: downVal,
+                                contact: contactVal,
+                                guests: guestsVal,
+                                type: 'package',
+                                paymentmethod: 'package-downpayment',
+                                otpVerified: true,
+                                verifiedAt: Date.now()
+                            };
+                            
+                            // Store in sessionStorage (will be cleared after payment or page close)
+                            sessionStorage.setItem('pendingPackageBooking', JSON.stringify(bookingData));
+                            console.log('💾 Package booking data stored in sessionStorage:', bookingData);
+                            
+                            // Now reset selections since data is safely stored
+                            selectedPackageId = null;
+                            selectedPackageTitle = null;
+                            selectedVenue = null;
+                            
+                            // Create URL parameters for payment page
+                            const paymentParams = new URLSearchParams({
+                                // Pass downpayment as the payment amount
+                                amount: downVal || '',
+                                email: emailVal,
+                                budget: budgetVal,
+                                // Indicate this is from package booking
+                                source: 'package',
+                                otpVerified: 'true'
+                            });
+                            
+                            // Redirect to payment page with booking data
+                            window.location.href = `pay/payment.html?${paymentParams.toString()}`;
+                        } else {
+                            // OTP verification failed - do not proceed with booking
+                            showErrorModal(['❌ Invalid OTP code. Please check your email and enter the correct 6-digit code.']);
+                            
+                            // Clear the OTP input for retry
+                            const otpInput = document.getElementById('otp-code');
+                            if (otpInput) {
+                                otpInput.value = '';
+                                otpInput.focus();
+                            }
+                        }
+                    } catch (_) {
+                        showErrorModal(['Unable to verify OTP. Please try again.']);
+                    }
+                });
+            }
+
+            // Resend OTP
+            if (resendOtpBtn) {
+                resendOtpBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('email')?.value?.trim() || '';
+                    
+                    if (!email) {
+                        showErrorModal(['Email address is required to resend OTP']);
+                        return;
+                    }
+
+                    // Get the original booking data from the venue modal
+                    const { fullNameVal, coupleNameVal, timeVal, dateVal, contactVal, themeVal, guestsVal, budgetVal, downVal } = buildPayload();
+                    const payload = {
+                        fullname: fullNameVal,
+                        couplename: coupleNameVal,
+                        email: email,
+                        reception: selectedVenue,
+                        eventtype: selectedPackageTitle || '',
+                        theme: themeVal,
+                        time: timeVal,
+                        date: dateVal,
+                        budget: budgetVal,
+                        downpayment: downVal,
+                        contact: contactVal,
+                        guests: guestsVal,
+                        paymentmethod: 'package-downpayment'
+                    };
+
+                    try {
+                        const res = await fetch('http://localhost:4400/book/package-otp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!res.ok) {
+                            const err = await res.json().catch(() => ({ error: 'Failed to resend OTP' }));
+                            showErrorModal([err.error || 'Failed to resend OTP']);
+                            return;
+                        }
+
+                        // Restart countdown using server-provided TTL if available
+                        let ttlSeconds = 600;
+                        try {
+                            const body = await res.json();
+                            if (body && typeof body.ttlSeconds === 'number') ttlSeconds = body.ttlSeconds;
+                        } catch(_) { /* ignore */ }
+                        startOtpCountdown(ttlSeconds);
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'New OTP code sent',
+                                text: 'Please check your email.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    } catch (_) {
+                        showErrorModal(['Unable to resend OTP. Please try again.']);
+                    }
+                });
+            }
+        });
+    </script>
+         <div class="bottom-controls">
+             <button id="bottom-prev" class="package-button">prev</button>
+             <button id="bottom-next" class="package-button">next</button>
+         </div>
+    <script>
+        (function(){
+            try {
+                function api(url){ return (location && location.protocol === 'file:' ? 'http://localhost:5000' : '') + url; }
+                function resolveLogoUrl(u){
+                    if (!u) return '';
+                    const s = String(u).trim();
+                    if (!s) return '';
+                    if (s.startsWith('/uploads/')) return api(s);
+                    if (/^https?:\/\//i.test(s) || /^data:/i.test(s) || /^file:\/\//i.test(s)) return s;
+                    return s;
+                }
+                let applyTimer = null;
+                async function applyHexLogo(){
+                    let backend = null;
+                    let local = null;
+                    try {
+                        const r = await fetch(api('/api/page-overrides/global'));
+                        if (r.ok) {
+                            const j = await r.json();
+                            backend = (j && j.data) || null;
+                        }
+                    } catch (_) {}
+                    try {
+                        const raw = localStorage.getItem('pageOverrides:global');
+                        if (raw) local = JSON.parse(raw);
+                    } catch (_) {}
+                    const data = Object.assign({}, backend || {}, local || {});
+                    const text = (data && data.hexLogoText) || '';
+                    const bg = (data && data.hexLogoBg) || '';
+                    const color = (data && data.hexLogoTextColor) || '';
+                    if (!text && !bg && !color) return;
+                    const els = document.querySelectorAll('.hex-logo');
+                    els.forEach(el => {
+                        if (text) el.textContent = text;
+                        if (color) el.style.color = color;
+                        if (bg) {
+                            const u = resolveLogoUrl(bg);
+                            if (u) {
+                                el.style.backgroundImage = `url('${u}')`;
+                                el.style.backgroundSize = 'cover';
+                                el.style.backgroundPosition = 'center';
+                                el.style.backgroundColor = 'transparent';
+                            }
+                        }
+                    });
+                }
+                applyHexLogo();
+                try { window.applyHexLogo = applyHexLogo; } catch(_) {}
+                window.addEventListener('storage', (e) => {
+                    if (!e) return;
+                    if (e.key === 'pageOverrides:global') {
+                        if (applyTimer) clearTimeout(applyTimer);
+                        applyTimer = setTimeout(applyHexLogo, 200);
+                    }
+                });
+            } catch (_) {}
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Settings</title>
+  <style>
+    :root {
+      --content-bg: #0b1220;
+      --text: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: var(--content-bg);
+    }
+
+
+    iframe {
+      width: 100%;
+      border: 0;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="settings-frame" src="reset_password.html" loading="lazy"></iframe>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auth guard: redirect to login if no valid token
+      try {
+        const token = localStorage.getItem('adminToken');
+        const expiry = parseInt(localStorage.getItem('adminTokenExpiry') || '0', 10);
+        const now = Date.now();
+        if (!token || !expiry || now >= expiry) {
+          window.location.href = 'admin.html';
+          return;
+        }
+      } catch (_) {}
+
+      const frame = document.getElementById('settings-frame');
+      function sizeFrameSafely() {
+        if (!frame) return;
+        try {
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          const height = Math.max(
+            doc.body.scrollHeight,
+            doc.documentElement.scrollHeight
+          );
+          frame.style.height = height + 'px';
+        } catch (_) {
+          frame.style.height = '80vh';
+        }
+      }
+      frame && (frame.onload = sizeFrameSafely);
+    });
+  </script>
+</body>
+</html>
+
+

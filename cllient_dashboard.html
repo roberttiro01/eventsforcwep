@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - CWEP</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <!-- Top Information Bar -->
+    <div class="info-bar">
+        <div class="logo">
+            <div class="hex-logo">CWEP</div>
+        </div>
+        
+        <div class="contact-info">
+            <div class="info-item">
+                <div class="icon location-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 21c-4.418 0-8-5.373-8-10a8 8 0 1 1 16 0c0 4.627-3.582 10-8 10z"/>
+                        <circle cx="12" cy="11" r="3"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">KASADYA POBLACION CORDOVA</div>
+                    <div class="sub">CEBU</div>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="icon clock-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">OFFICE HOURS</div>
+                    <div class="sub">8:00AM-9:00PM</div>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="icon phone-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 3.09 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.05a2 2 0 0 1-.45 2.11l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.98.35 2 .59 3.05.72A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">09876356425</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-menu">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="about.html" class="nav-item">About Us</a>
+            <a href="services.html" class="nav-item">Services</a>
+            <a href="packages.html" class="nav-item">Packages</a>
+            <a href="contact.html" class="nav-item">Contact</a>
+            <a href="testimonials.html" class="nav-item">Testimonials</a>
+            <a href="admin.html" class="nav-item">Log in as admin</a>
+        </div>
+        
+        <a href="book.html" class="book-button">Book</a>
+    </div>
+    
+    <!-- Pending Clients Section -->
+    <div class="pc-wrapper">
+        <div class="pc-card">
+        <div class="pc-header">
+            <h2 class="pc-title">Client Dashboard</h2>
+            <div class="pc-actions">
+                <button id="pc-history" class="pc-btn pc-history-btn" type="button" title="View History">History</button>
+                <div class="pc-search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="Search" aria-label="Search pending clients" />
+                </div>
+            </div>
+        </div>
+
+            <div class="pc-table-container">
+                <table class="pc-table">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Couple Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Guests</th>
+                            <th>Reception</th>
+                            <th>Event</th>
+                            <th>Theme</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                            <th>Budget</th>
+                            <th>Downpayment</th>
+                            <th>Bal</th>
+                            <th>Type</th>
+                            <th>Payment Status</th>
+                            <th>Status</th>
+                            <th>View</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pc-tbody">
+                        <!-- rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pc-pagination" style="display:flex;align-items:center;justify-content:center;margin-top:10px;gap:10px;">
+                <div class="pc-page-nav" style="display:flex;align-items:center;gap:8px;">
+                    <button id="pc-prev" class="pc-btn" style="padding:6px 10px;background:#f3f4f6;color:#333;">Prev</button>
+                    <span id="pc-page" style="font-size:12px;color:#1f1f1f;"></span>
+                    <button id="pc-next" class="pc-btn" style="padding:6px 10px;background:#f3f4f6;color:#333;">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Modal for viewing booking details -->
+    <div id="bookingModal" class="modern-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="header-text">
+                            <h2>Booking Details</h2>
+                            <p>Complete information about this booking</p>
+                        </div>
+                    </div>
+                    <button class="close-btn" aria-label="Close modal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="details-grid">
+                        <div class="detail-card" id="payment-status-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Full Name</span>
+                                <span class="detail-value" id="modal-full-name">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Couple Name</span>
+                                <span class="detail-value" id="modal-couple-name">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value" id="modal-email">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Phone</span>
+                                <span class="detail-value" id="modal-phone">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Event Type</span>
+                                <span class="detail-value" id="modal-event-type">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Theme</span>
+                                <span class="detail-value" id="modal-theme">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Reception</span>
+                                <span class="detail-value" id="modal-reception">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Event Date</span>
+                                <span class="detail-value" id="modal-event-date">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Time Slot</span>
+                                <span class="detail-value" id="modal-time-slot">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Number of Guests</span>
+                                <span class="detail-value" id="modal-guests">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <text x="12" y="16" text-anchor="middle" font-size="16" font-weight="700">₱</text>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Budget</span>
+                                <span class="detail-value" id="modal-budget">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <text x="12" y="16" text-anchor="middle" font-size="16" font-weight="700">₱</text>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Downpayment</span>
+                                <span class="detail-value" id="modal-downpayment">-</span>
+                            </div>
+                        </div>
+                     <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 11H5a2 2 0 0 0-2 2v3c0 1.1.9 2 2 2h4m0-7v7m0-7h10a2 2 0 0 1 2 2v3c0 1.1-.9 2-2 2H9m0-7V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Type</span>
+                                <span class="detail-value" id="modal-type">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1l3 5 5 .5-3.8 3.3 1 5-5-2.6-5 2.6 1-5L2 6.5 7 6z"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Payment Status</span>
+                                <span class="detail-value status-badge" id="modal-payment-status">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card status-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 12l2 2 4-4"></path>
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value status-badge" id="modal-status">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Cancellation Reason (shown only when status is cancelled) -->
+                        <div class="detail-card cancel-reason-card" id="cancel-reason-card" style="display:none;">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <circle cx="12" cy="16" r="1"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Cancellation Reason</span>
+                                <span class="detail-value" id="modal-cancel-reason">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Accepted Info (shown only when status is accepted) -->
+                        <div class="detail-card accepted-info-card" id="accepted-info-card" style="display:none;">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Info</span>
+                                <span class="detail-value" id="modal-accepted-info">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Accepted time & date (PH time) -->
+                        <div class="detail-card accepted-time-card" id="accepted-time-card" style="display:none;">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Accepted (Philippine Time)</span>
+                                <span class="detail-value" id="modal-accepted-datetime">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card created-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2v4"></path>
+                                    <path d="M16 6h4"></path>
+                                    <path d="M18 16v2a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2"></path>
+                                    <path d="M18 8H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2z"></path>
+                                    <path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Created Date & Time</span>
+                                <span class="detail-value" id="modal-created-datetime">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                        url('indeximages/evensss.jpg') center/cover no-repeat fixed;
+            min-height: 100vh;
+        }
+
+        .pc-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .pc-card {
+            width: 100%;
+            max-width: 1600px;
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(6px);
+            border-radius: 16px;
+            padding: 28px 28px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .pc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pc-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pc-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1e1e1e;
+        }
+
+        .pc-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid rgba(125, 13, 36, 0.25);
+            color: #8c8c8c;
+            width: 300px;
+            max-width: 300px;
+        }
+
+        .pc-search input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .pc-table-container {
+            width: 100%;
+            overflow-x: auto;
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        .pc-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #1f1f1f;
+            table-layout: auto;
+        }
+
+        .pc-table thead th {
+            font-weight: 700;
+            text-align: left;
+            font-size: 12px;
+            color: #7d0d24;
+            padding: 10px 8px;
+            white-space: nowrap;
+        }
+
+        .pc-table tbody td {
+            padding: 10px 8px;
+            border-top: 2px solid rgba(125, 13, 36, 0.35);
+            font-size: 12px;
+            overflow: visible;
+            text-overflow: unset;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 150px;
+        }
+
+        /* Status column styling */
+        .pc-table tbody td:last-child {
+            overflow: visible;
+            white-space: normal;
+        }
+
+        .pc-table tbody tr:last-child td {
+            border-bottom: 2px solid rgba(125, 13, 36, 0.35);
+        }
+
+        .pc-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .pc-badge-accepted {
+            background: #d4f5df;
+            color: #168a3b;
+        }
+
+        .pc-badge-pending {
+            background: #eaf3ff;
+            color: #2c62d6;
+        }
+
+        .pc-badge-deleted {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .pc-badge-cancelled {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+
+        .pc-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pc-btn-view {
+            background: transparent;
+            color: #666;
+            padding: 8px;
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+        }
+
+        .pc-btn-view:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+            transform: scale(1.05);
+        }
+
+        .pc-btn-view svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .pc-history-btn {
+            padding: 8px 12px;
+            background: #7d0d24;
+            color: #fff;
+            border: 1px solid rgba(125, 13, 36, 0.25);
+        }
+
+        .pc-history-btn:hover {
+            background: #a0152e;
+        }
+
+        /* Modern Modal Styles */
+        .modern-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .modal-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-modal.show .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 32px 24px;
+            background: linear-gradient(135deg, rgba(125, 13, 36, 0.08), rgba(125, 13, 36, 0.04));
+            border-bottom: 1px solid rgba(125, 13, 36, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #7d0d24, #a0152e);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(125, 13, 36, 0.3);
+        }
+
+        .header-text h2 {
+            color: #1a1a1a;
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+            transform: scale(1.05);
+        }
+
+        .modal-body {
+            padding: 32px;
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #7d0d24, #a0152e);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .detail-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(125, 13, 36, 0.1), rgba(125, 13, 36, 0.05));
+            border-radius: 12px;
+            color: #7d0d24;
+            flex-shrink: 0;
+        }
+
+        .detail-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            color: #1a1a1a;
+            font-size: 16px;
+            font-weight: 600;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .status-card {
+            background: linear-gradient(145deg, rgba(125, 13, 36, 0.05), rgba(125, 13, 36, 0.02));
+        }
+
+        .created-card {
+            background: linear-gradient(145deg, rgba(34, 197, 94, 0.05), rgba(34, 197, 94, 0.02));
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            grid-column: 1 / -1;
+            justify-self: center;
+            max-width: 400px;
+        }
+
+        .created-card .detail-icon {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+            color: #22c55e;
+        }
+
+        .created-card::before {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Center the cancellation reason card in the modal */
+        .cancel-reason-card {
+            grid-column: 1 / -1;
+            justify-self: center;
+            text-align: center;
+            max-width: 700px;
+            background: linear-gradient(145deg, rgba(220, 38, 38, 0.06), rgba(220, 38, 38, 0.03));
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .cancel-reason-card .detail-icon {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.12), rgba(220, 38, 38, 0.06));
+            color: #dc2626;
+        }
+
+        #modal-cancel-reason {
+            color: #b91c1c;
+        }
+
+        /* Accepted info card (green badge) */
+        .accepted-info-card {
+            grid-column: 1 / -1;
+            justify-self: center;
+            text-align: center;
+            max-width: 700px;
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.04));
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+        .accepted-info-card .detail-icon {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(16, 185, 129, 0.08));
+            color: #16a34a;
+        }
+        #modal-accepted-info {
+            color: #065f46;
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* Accepted time card */
+        .accepted-time-card {
+            grid-column: 1 / -1;
+            justify-self: center;
+            text-align: center;
+            max-width: 500px;
+            background: linear-gradient(145deg, rgba(34, 197, 94, 0.06), rgba(34, 197, 94, 0.03));
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .accepted-time-card .detail-icon {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.06));
+            color: #22c55e;
+        }
+        #modal-accepted-datetime {
+            color: #166534;
+            font-weight: 700;
+        }
+
+        /* Link button for location */
+        .link-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 10px; /* smaller padding */
+            border-radius: 8px; /* smaller radius */
+            font-size: 11px; /* smaller text */
+            font-weight: 700;
+            color: #ffffff;
+            background: #16a34a;
+            text-decoration: none;
+            border: 1px solid #0f9a40;
+            transition: all 0.2s ease;
+        }
+        .link-btn:hover {
+            background: #0f9a40;
+        }
+
+        .dp-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .dp-btn {
+            padding: 8px 12px;
+            background: #7d0d24;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .dp-btn:hover {
+            background: #a0152e;
+        }
+
+        /* Custom scrollbar */
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(125, 13, 36, 0.3);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(125, 13, 36, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .pc-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .pc-search {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .pc-search input {
+                width: 100%;
+            }
+
+            .modal-container {
+                padding: 16px;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+            }
+            
+            .modal-header {
+                padding: 24px 24px 20px;
+            }
+            
+            .header-text h2 {
+                font-size: 24px;
+            }
+            
+            .modal-body {
+                padding: 24px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .detail-card {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pc-search {
+                padding: 6px 10px;
+                gap: 8px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .pc-search input {
+                font-size: 13px;
+                width: 100%;
+            }
+
+            .header-content {
+                gap: 12px;
+            }
+            
+            .header-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .header-text h2 {
+                font-size: 20px;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+        }
+
+
+        @media (max-width: 900px) {
+            .pc-title { font-size: 22px; }
+            .pc-search { 
+                width: 250px;
+                max-width: 250px;
+            }
+            .pc-search input { width: 100%; }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.getElementById('pc-tbody');
+            const searchInput = document.querySelector('.pc-search input');
+            const historyBtn = document.getElementById('pc-history');
+            let searchBound = false;
+
+            // Pagination state
+            const prevBtn = document.getElementById('pc-prev');
+            const nextBtn = document.getElementById('pc-next');
+            const pageSpan = document.getElementById('pc-page');
+            let allRowsData = [];
+            let filteredRowsData = [];
+            let currentPage = 1;
+            let rowsPerPage = 5;
+
+            function formatTimeDisplay(raw) {
+                if (!raw) return '';
+                const value = String(raw).trim();
+
+                // Try patterns with am/pm already present
+                const ampmMatch = value.match(/^(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?|am|pm)$/i);
+                if (ampmMatch) {
+                    let hour = parseInt(ampmMatch[1], 10);
+                    let minute = ampmMatch[2] !== undefined ? parseInt(ampmMatch[2], 10) : 0;
+                    const suffixRaw = ampmMatch[3].toLowerCase();
+                    const suffix = suffixRaw.startsWith('a') ? 'Am' : 'Pm';
+                    if (hour === 0) hour = 12;
+                    if (hour > 12) hour = hour % 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour}:${mm}${suffix}`;
+                }
+
+                // 24-hour formats like 14:05 or 9:5 or 09:05 or just 14
+                const h24Match = value.match(/^(2[0-3]|[01]?\d)(?::([0-5]?\d))?$/);
+                if (h24Match) {
+                    let hour24 = parseInt(h24Match[1], 10);
+                    let minute = h24Match[2] !== undefined ? parseInt(h24Match[2], 10) : 0;
+                    const isPm = hour24 >= 12;
+                    let hour12 = hour24 % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour12}:${mm}${isPm ? 'Pm' : 'Am'}`;
+                }
+
+                // Common textual formats like "14:00:00" or with seconds
+                const hmsMatch = value.match(/^(2[0-3]|[01]?\d):([0-5]\d):([0-5]\d)$/);
+                if (hmsMatch) {
+                    let hour24 = parseInt(hmsMatch[1], 10);
+                    let minute = parseInt(hmsMatch[2], 10);
+                    const isPm = hour24 >= 12;
+                    let hour12 = hour24 % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour12}:${mm}${isPm ? 'Pm' : 'Am'}`;
+                }
+
+                // Fallback: try Date parsing (last resort) and format
+                const parsed = new Date(`1970-01-01T${value}`);
+                if (!isNaN(parsed.getTime())) {
+                    let hour24 = parsed.getHours();
+                    const minute = parsed.getMinutes();
+                    const isPm = hour24 >= 12;
+                    let hour12 = hour24 % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour12}:${mm}${isPm ? 'Pm' : 'Am'}`;
+                }
+
+                // If all else fails, return the original value
+                return value;
+            }
+
+            function formatBudgetCommas(raw) {
+                if (raw === null || raw === undefined) return '';
+                const stringValue = String(raw).trim();
+                const numericString = stringValue.replace(/,/g, '').replace(/[^0-9.]/g, '');
+                const amount = parseFloat(numericString);
+                if (isNaN(amount)) return stringValue;
+                const hasDecimal = numericString.includes('.') && numericString.split('.')[1].length > 0;
+                return amount.toLocaleString('en-US', {
+                    minimumFractionDigits: hasDecimal ? 2 : 0,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            // Parse a money-like value (e.g. "1,000", "₱1,000.50") into a Number
+            
+
+            function formatCreatedDateTime(raw) {
+                if (!raw) return '';
+                
+                try {
+                    // Handle different date formats
+                    let date;
+                    
+                    // If it's a timestamp (number)
+                    if (typeof raw === 'number' || /^\d+$/.test(String(raw))) {
+                        date = new Date(parseInt(raw));
+                    }
+                    // If it's already a Date object or ISO string
+                    else {
+                        date = new Date(raw);
+                    }
+                    
+                    // Check if date is valid
+                    if (isNaN(date.getTime())) {
+                        return '';
+                    }
+                    
+                    // Format the date and time for Philippines timezone
+                    const options = {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                        timeZone: 'Asia/Manila'
+                    };
+                    
+                    return date.toLocaleDateString('en-US', options);
+                } catch (error) {
+                    console.error('Error formatting date:', error);
+                    return '';
+                }
+            }
+
+            function getCurrentPhilippinesDateTime() {
+                const now = new Date();
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Manila'
+                };
+                return now.toLocaleDateString('en-US', options);
+            }
+
+            let currentRowsData = []; // Store current page rows for modal lookup
+
+            function updatePaginationControls(total) {
+                const totalPages = Math.max(1, Math.ceil(total / rowsPerPage));
+                currentPage = Math.min(currentPage, totalPages);
+                
+                if (pageSpan) pageSpan.textContent = `${currentPage} / ${totalPages}`;
+                if (prevBtn) {
+                    prevBtn.disabled = currentPage <= 1;
+                    prevBtn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+                }
+                if (nextBtn) {
+                    nextBtn.disabled = currentPage >= totalPages;
+                    nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+                }
+            }
+
+            function renderTablePage(rows) {
+                tbody.innerHTML = '';
+                const startIdx = (currentPage - 1) * rowsPerPage;
+                const pageRows = rows.slice(startIdx, startIdx + rowsPerPage);
+                renderRows(pageRows);
+                currentRowsData = pageRows;
+                updatePaginationControls(rows.length);
+            }
+
+            function applySearchAndRender() {
+                const term = (searchInput?.value || '').toLowerCase().trim();
+                if (!term) {
+                    filteredRowsData = allRowsData.slice();
+                } else {
+                    filteredRowsData = allRowsData.filter(b => {
+                        const values = [
+                            b.full_name || b.Full_name || '',
+                            b.couple_name || b.Couple_name || '',
+                            b.email || b.Email || '',
+                            b.reception || b.Reception || '',
+                            b.event_type || b.Choose_your_event || '',
+                            b.theme || b.Theme || '',
+                            b.time_slot || b.Time || '',
+                            b.event_date || b.Date || '',
+                            b.budget || b.Budget || '',
+                            b.phone || b.Contact_number || '',
+                            b.guests || b.Number_of_guest || '',
+                            b.type || b.Type || '',
+                            b.status || 'pending'
+                        ].map(v => String(v).toLowerCase()).join(' ');
+                        return values.includes(term);
+                    });
+                }
+                currentPage = 1;
+                renderTablePage(filteredRowsData);
+            }
+
+
+            function renderRows(rows) {
+                console.log('Rendering rows:', rows);
+                // tbody innerHTML is managed by renderTablePage
+                rows.forEach((row, index) => {
+                    console.log(`Row ${index}:`, row);
+                    
+                    const tr = document.createElement('tr');
+                    const status = (row.status || 'pending').toLowerCase();
+                    const id = row.id || row.Id || null;
+                    const fullName = String(row.full_name || row.Full_name || '').trim();
+                    const email = String(row.email || row.Email || '').trim();
+                    const eventDate = String(row.event_date || row.Date || '').trim();
+                    const timeSlot = String(row.time_slot || row.Time || '').trim();
+                    const key = (row.key && String(row.key).trim()) || [fullName, email, eventDate, timeSlot].join('-');
+                    const fullNameSafe = row.full_name || row.Full_name || '';
+                    const coupleNameSafe = row.couple_name || row.Couple_name || '';
+                    const emailSafe = row.email || row.Email || '';
+                    const receptionSafe = row.reception || row.Reception || '';
+                    // Format event type to show package numbers clearly
+                    const rawEventType = row.event_type || row.Choose_your_event || '';
+                    const eventTypeSafe = (() => {
+                        if (!rawEventType) return '';
+                        const eventType = String(rawEventType).trim();
+                        // If it's a wedding package, make it more prominent
+                        if (eventType.toLowerCase().includes('wedding package')) {
+                            return eventType; // Keep as is (e.g., "Wedding Package 1")
+                        }
+                        return eventType;
+                    })();
+                    const themeSafe = row.theme || row.Theme || '';
+                    const timeSafe = formatTimeDisplay(row.time_slot || row.Time || '');
+                    const dateSafe = row.event_date || row.Date || '';
+                    const budgetSafe = formatBudgetCommas(row.budget || row.Budget || '');
+                    // Prefer DB downpayment; if empty, fallback to localStorage payments by key or by email|date
+                    let downpaymentValue = row.downpayment || row.Downpayment || '';
+                    try {
+                        if (downpaymentValue === '' || downpaymentValue === null || downpaymentValue === undefined) {
+                            const storeRaw = localStorage.getItem('payments');
+                            if (storeRaw) {
+                                const store = JSON.parse(storeRaw);
+                                const record = store[key];
+                                if (record && typeof record.amount !== 'undefined') {
+                                    downpaymentValue = record.amount;
+                                }
+                            }
+                            if (downpaymentValue === '' || downpaymentValue === null || downpaymentValue === undefined) {
+                                const idxRaw = localStorage.getItem('paymentsIndex');
+                                if (idxRaw) {
+                                    const idx = JSON.parse(idxRaw);
+                                    const idxKey = [String(emailSafe).trim(), String(dateSafe).trim()].join('|');
+                                    const idxRecord = idx[idxKey];
+                                    if (idxRecord && typeof idxRecord.amount !== 'undefined') {
+                                        downpaymentValue = idxRecord.amount;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (_) {}
+                    const downpaymentSafe = formatBudgetCommas(downpaymentValue);
+                    
+                    const phoneSafe = row.phone || row.Contact_number || '';
+                    const guestsSafe = row.guests || row.Number_of_guest || '';
+                    // Format payment method for display
+                    const rawType = row.type || row.Type || '';
+                    const typeSafe = (() => {
+                        if (!rawType) return '';
+                        const type = String(rawType).toLowerCase().trim();
+                        if (type === 'gcash') return 'GCash';
+                        if (type === 'paymaya') return 'PayMaya';
+                        if (type === 'card') return 'Credit/Debit Card';
+                        if (type === 'package-downpayment') return 'Package Downpayment';
+                        if (type === 'full-payment') return 'Full Payment';
+                        // Return original if no match
+                        return rawType;
+                    })();
+
+                    
+
+                    // Compute balance = budget - downpayment (fallbacks handled above)
+                    let balanceValue = '';
+                    try {
+                        const budNum = parseFloat(String(budgetSafe).replace(/,/g, ''));
+                        const downNum = parseFloat(String(downpaymentSafe).replace(/,/g, ''));
+                        if (!isNaN(budNum)) {
+                            const diff = budNum - (isNaN(downNum) ? 0 : downNum);
+                            balanceValue = diff.toLocaleString('en-US', { maximumFractionDigits: 2 });
+                        }
+                    } catch (_) {}
+                    const balanceDisplay = balanceValue ? `₱${balanceValue}` : '';
+
+                    tr.innerHTML = `
+                        <td>${fullNameSafe}</td>
+                        <td>${coupleNameSafe}</td>
+                        <td>${emailSafe}</td>
+                        <td>${phoneSafe}</td>
+                        <td>${guestsSafe}</td>
+                        <td>${receptionSafe}</td>
+                        <td>${eventTypeSafe}</td>
+                        <td>${themeSafe}</td>
+                        <td>${timeSafe}</td>
+                        <td>${dateSafe}</td>
+                        <td>₱${budgetSafe}</td>
+                        <td>${downpaymentSafe}</td>
+                        <td>${balanceDisplay}</td>
+                        <td>${typeSafe}</td>
+                        <td data-payment-status-cell>
+                            ${(() => {
+                                const normalizePayStatus = (raw) => {
+                                    if (raw === null || raw === undefined) return '';
+                                    let s = String(raw).trim().toLowerCase();
+                                    s = s.replace(/^[^a-z0-9]+/g, '');
+                                    s = s.replace(/^[a-z]\s+/g, '');
+                                    // robust substring checks - check for exact patterns first
+                                    if (s.includes('awaiting_payment_action') || s.includes('awaiting payment action')) return 'awaiting_payment_action';
+                                    if (s.includes('awaiting_next_action') || s.includes('awaiting next action')) return 'awaiting_next_action';
+                                    if (s.includes('awaiting_payment_method') || s.includes('awaiting payment method')) return 'awaiting_payment_method';
+                                    if (s.includes('await')) return s.includes('next') ? 'awaiting_next_action' : 'awaiting_payment_method';
+                                    if (s.includes('pend')) return 'pending';
+                                    if (s.includes('process')) return 'processing';
+                                    if (s.includes('expired')) return 'failed';
+                                    if (s.includes('fail')) return 'failed';
+                                    if (s.includes('cancel')) return 'cancelled';
+                                    if (s.includes('paid') || s.includes('success')) return 'succeeded';
+                                    return s;
+                                };
+                                const ps = normalizePayStatus(row.payment_status);
+                                // Debug: log the raw value and normalized result
+                                console.log('Payment Status Debug:', { raw: row.payment_status, normalized: ps });
+                                if (ps === '') return '';
+                                if (ps === 'succeeded') {
+                                    return '<span style="color: green; font-weight: bold;">Success</span>';
+                                }
+                                if (ps === 'failed' || ps === 'cancelled' || ps === 'canceled') {
+                                    return ps.charAt(0).toUpperCase() + ps.slice(1);
+                                }
+                                if (ps === 'awaiting_next_action') {
+                                    return 'Awaiting Next Action';
+                                }
+                                if (ps === 'awaiting_payment_action') {
+                                    return 'Awaiting Payment Action';
+                                }
+                                if (ps === 'awaiting_payment_method') {
+                                    return '<span style="color: red; font-weight: bold;">FAILED</span>';
+                                }
+                                // Anything else renders as Pending to avoid accidental "Success"
+                                return 'Pending';
+                            })()}
+                        </td>
+                        <td data-status-cell>
+                            ${status === 'deleted' ? `
+                                <span class="pc-badge pc-badge-deleted">Deleted</span>
+                            ` : status === 'accepted' ? `
+                                <span class="pc-badge pc-badge-accepted">Accepted</span>
+                            ` : status === 'cancelled' ? `
+                                <span class="pc-badge pc-badge-cancelled">Cancelled</span>
+                            ` : `
+                                <span class="pc-badge pc-badge-pending">Pending</span>
+                            `}
+                        </td>
+                        <td>
+                            <button class="pc-btn pc-btn-view" type="button" 
+                                    data-id="${id !== null ? id : ''}" 
+                                    data-key="${key}"
+                                    data-full-name="${fullName.replace(/"/g, '&quot;')}"
+                                    data-email="${email.replace(/"/g, '&quot;')}"
+                                    data-event-date="${eventDate.replace(/"/g, '&quot;')}"
+                                    data-time-slot="${timeSlot.replace(/"/g, '&quot;')}"
+                                    title="View Details"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Wire View button event handlers
+                tbody.querySelectorAll('.pc-btn-view').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const button = e.currentTarget;
+                        const rowData = {
+                            id: button.dataset.id,
+                            key: button.dataset.key,
+                            full_name: button.dataset.fullName,
+                            email: button.dataset.email,
+                            event_date: button.dataset.eventDate,
+                            time_slot: button.dataset.timeSlot
+                        };
+                        
+                        // Find the full row data from currentRowsData
+                        const fullData = currentRowsData.find(row => 
+                            (row.id && row.id.toString() === rowData.id) ||
+                            (row.key === rowData.key) ||
+                            (row.full_name === rowData.full_name && row.email === rowData.email)
+                        );
+                        
+                        if (fullData) {
+                            showBookingModal(fullData);
+                        }
+                    });
+                });
+
+                // Wire Action button event handlers
+                tbody.querySelectorAll('.pc-btn-accept').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const bookingId = e.currentTarget.dataset.id;
+                        const fullName = e.currentTarget.dataset.fullName;
+                        
+                        if (confirm(`Are you sure you want to accept the booking for ${fullName}?`)) {
+                            updateBookingStatus(bookingId, 'accepted', e.currentTarget);
+                        }
+                    });
+                });
+
+                tbody.querySelectorAll('.pc-btn-cancel').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const bookingId = e.currentTarget.dataset.id;
+                        const fullName = e.currentTarget.dataset.fullName;
+                        
+                        if (confirm(`Are you sure you want to cancel the booking for ${fullName}?`)) {
+                            updateBookingStatus(bookingId, 'cancelled', e.currentTarget);
+                        }
+                    });
+                });
+
+                tbody.querySelectorAll('.pc-btn-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const bookingId = e.currentTarget.dataset.id;
+                        const fullName = e.currentTarget.dataset.fullName;
+                        
+                        if (confirm(`Are you sure you want to permanently delete the booking for ${fullName}? This action cannot be undone and will remove the record from the database.`)) {
+                            deleteBooking(bookingId, e.currentTarget);
+                        }
+                    });
+                });
+            }
+
+            async function updateBookingStatus(bookingId, status, buttonElement) {
+                try {
+                    // Show loading state on button
+                    const originalText = buttonElement.textContent;
+                    buttonElement.textContent = 'Loading...';
+                    buttonElement.disabled = true;
+
+                    const response = await fetch(`http://localhost:4400/api/book/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: bookingId, status: status })
+                    });
+
+                    if (response.ok) {
+                        // Success - refresh the table to show updated data
+                        refresh();
+                        alert(`Booking ${status} successfully!`);
+                        
+                        // Signal other tabs to refresh (cross-tab communication)
+                        localStorage.setItem('events:refresh', Date.now().toString());
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `Failed to ${status} booking`);
+                    }
+                } catch (error) {
+                    console.error(`Error updating booking status:`, error);
+                    alert(`Error: ${error.message}`);
+                    
+                    // Restore button state on error
+                    buttonElement.textContent = originalText;
+                    buttonElement.disabled = false;
+                }
+            }
+
+            async function deleteBooking(bookingId, buttonElement) {
+                try {
+                    // Show loading state on button
+                    const originalText = buttonElement.textContent;
+                    buttonElement.textContent = 'Deleting...';
+                    buttonElement.disabled = true;
+
+                    const response = await fetch(`http://localhost:4400/api/book/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: bookingId })
+                    });
+
+                    if (response.ok) {
+                        // Success - refresh the table to show updated data
+                        refresh();
+                        alert('Booking deleted successfully! The record has been permanently removed from the database.');
+                        
+                        // Signal other tabs to refresh (cross-tab communication)
+                        localStorage.setItem('events:refresh', Date.now().toString());
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to delete booking');
+                    }
+                } catch (error) {
+                    console.error('Error deleting booking:', error);
+                    alert(`Error: ${error.message}`);
+                    
+                    // Restore button state on error
+                    buttonElement.textContent = originalText;
+                    buttonElement.disabled = false;
+                }
+            }
+
+            async function refresh() {
+            // Try to synchronize pending payments with PayMongo before loading bookings
+            try {
+                await fetch('http://localhost:3000/sync-pending-payments', { method: 'POST' });
+            } catch (_) {}
+            fetch('http://localhost:4400/api/book')
+                .then(r => r.json())
+                .then(async data => {
+                    const book = data.bookings || data.data || [];
+                    console.log('Received booking data:', book);
+                    console.log('Number of bookings:', book.length);
+
+                    allRowsData = book;
+                    filteredRowsData = allRowsData.slice();
+                    currentPage = 1;
+                    renderTablePage(filteredRowsData);
+
+                    // simple client-side search
+                    if (!searchBound) {
+                        searchInput.addEventListener('input', function() {
+                            applySearchAndRender();
+                        });
+                        searchBound = true;
+
+                        // Pagination wiring
+                        if (prevBtn) {
+                            prevBtn.addEventListener('click', () => {
+                                if (currentPage > 1) {
+                                    currentPage -= 1;
+                                    renderTablePage(filteredRowsData);
+                                }
+                            });
+                        }
+                        if (nextBtn) {
+                            nextBtn.addEventListener('click', () => {
+                                const totalPages = Math.max(1, Math.ceil(filteredRowsData.length / rowsPerPage));
+                                if (currentPage < totalPages) {
+                                    currentPage += 1;
+                                    renderTablePage(filteredRowsData);
+                                }
+                            });
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load book', err);
+                });
+            }
+
+            // Function to show booking modal with data
+            function showBookingModal(booking) {
+                // Populate modal with booking data
+                document.getElementById('modal-full-name').textContent = booking.full_name || booking.Full_name || '-';
+                document.getElementById('modal-couple-name').textContent = booking.couple_name || booking.Couple_name || '-';
+                document.getElementById('modal-email').textContent = booking.email || booking.Email || '-';
+                document.getElementById('modal-phone').textContent = booking.phone || booking.Contact_number || '-';
+                // Format event type for modal display
+                const rawModalEventType = booking.event_type || booking.Choose_your_event || '';
+                const formattedModalEventType = (() => {
+                    if (!rawModalEventType) return '-';
+                    const eventType = String(rawModalEventType).trim();
+                    // If it's a wedding package, make it more prominent
+                    if (eventType.toLowerCase().includes('wedding package')) {
+                        return eventType; // Keep as is (e.g., "Wedding Package 1")
+                    }
+                    return eventType;
+                })();
+                document.getElementById('modal-event-type').textContent = formattedModalEventType;
+                document.getElementById('modal-theme').textContent = booking.theme || booking.Theme || '-';
+                document.getElementById('modal-reception').textContent = booking.reception || booking.Reception || '-';
+                document.getElementById('modal-event-date').textContent = booking.event_date || booking.Date || '-';
+                document.getElementById('modal-time-slot').textContent = formatTimeDisplay(booking.time_slot || booking.Time || '');
+                document.getElementById('modal-guests').textContent = booking.guests || booking.Number_of_guest || '-';
+                document.getElementById('modal-budget').textContent = booking.budget ? `₱${formatBudgetCommas(booking.budget)}` : '-';
+                document.getElementById('modal-downpayment').textContent = booking.downpayment ? `₱${formatBudgetCommas(booking.downpayment)}` : '-';
+                // Format payment method for modal display
+                const rawModalType = booking.type || booking.Type || '';
+                const formattedModalType = (() => {
+                    if (!rawModalType) return '-';
+                    const type = String(rawModalType).toLowerCase().trim();
+                    if (type === 'gcash') return 'GCash';
+                    if (type === 'paymaya') return 'PayMaya';
+                    if (type === 'card') return 'Credit/Debit Card';
+                    if (type === 'package-downpayment') return 'Package Downpayment';
+                    if (type === 'full-payment') return 'Full Payment';
+                    return rawModalType;
+                })();
+                document.getElementById('modal-type').textContent = formattedModalType;
+                
+                // Set status with appropriate styling
+                const statusElement = document.getElementById('modal-status');
+                const status = booking.status || 'pending';
+                statusElement.textContent = status.toUpperCase();
+                statusElement.className = `detail-value status-badge pc-badge-${status}`;
+
+                // Set payment status with appropriate styling (hide when empty)
+                const paymentStatusCard = document.getElementById('payment-status-card');
+                const paymentStatusElement = document.getElementById('modal-payment-status');
+                const rawPaymentStatus = booking.payment_status;
+                if (rawPaymentStatus === null || rawPaymentStatus === undefined || String(rawPaymentStatus).trim() === '') {
+                    paymentStatusCard.style.display = 'none';
+                    paymentStatusElement.textContent = '';
+                    paymentStatusElement.className = 'detail-value status-badge';
+                } else {
+                    paymentStatusCard.style.display = '';
+                    const normalizePayStatus = (raw) => {
+                        if (raw === null || raw === undefined) return '';
+                        let s = String(raw).trim().toLowerCase();
+                        s = s.replace(/^[^a-z0-9]+/g, '');
+                        s = s.replace(/^[a-z]\s+/g, '');
+                        // robust substring checks - check for exact patterns first
+                        if (s.includes('awaiting_payment_action') || s.includes('awaiting payment action')) return 'awaiting_payment_action';
+                        if (s.includes('awaiting_next_action') || s.includes('awaiting next action')) return 'awaiting_next_action';
+                        if (s.includes('awaiting_payment_method') || s.includes('awaiting payment method')) return 'awaiting_payment_method';
+                        if (s.includes('await')) return s.includes('next') ? 'awaiting_next_action' : 'awaiting_payment_method';
+                        if (s.includes('pend')) return 'pending';
+                        if (s.includes('process')) return 'processing';
+                        if (s.includes('expired')) return 'failed';
+                        if (s.includes('fail')) return 'failed';
+                        if (s.includes('cancel')) return 'cancelled';
+                        if (s.includes('paid') || s.includes('success')) return 'succeeded';
+                        return s;
+                    };
+                    const psRaw = normalizePayStatus(rawPaymentStatus);
+                    let psText = '';
+                    let psStyle = '';
+                    if (psRaw === 'succeeded') {
+                        psText = 'Success';
+                        psStyle = 'color: green; font-weight: bold;';
+                    } else if (psRaw === 'failed' || psRaw === 'cancelled' || psRaw === 'canceled') {
+                        psText = psRaw.charAt(0).toUpperCase() + psRaw.slice(1);
+                    } else if (psRaw === 'awaiting_next_action') {
+                        psText = 'Awaiting Next Action';
+                    } else if (psRaw === 'awaiting_payment_action') {
+                        psText = 'Awaiting Payment Action';
+                    } else if (psRaw === 'awaiting_payment_method') {
+                        psText = 'Awaiting Payment Method';
+                        psStyle = 'color: red; font-weight: bold;';
+                    } else {
+                        psText = 'Pending';
+                    }
+                    paymentStatusElement.innerHTML = psStyle ? `<span style="${psStyle}">${psText}</span>` : psText;
+                    paymentStatusElement.className = 'detail-value';
+                }
+
+                // Show cancellation reason if cancelled
+                const cancelCard = document.getElementById('cancel-reason-card');
+                const cancelReasonEl = document.getElementById('modal-cancel-reason');
+                if (String(status).toLowerCase() === 'cancelled') {
+                    const providedReason = booking.cancel_reason || booking.cancellation_reason || '';
+                    const defaultReason = 'Your booking was cancelled. Possible reasons include: payment was not successful, your identity could not be verified, or we cannot accept four (4) or more bookings in a single day.';
+                    cancelReasonEl.textContent = (providedReason && String(providedReason).trim()) ? providedReason : defaultReason;
+                    cancelCard.style.display = '';
+                } else {
+                    cancelCard.style.display = 'none';
+                    cancelReasonEl.textContent = '';
+                }
+
+                // Show accepted info badge if accepted
+                const acceptedCard = document.getElementById('accepted-info-card');
+                const acceptedInfoEl = document.getElementById('modal-accepted-info');
+                if (String(status).toLowerCase() === 'accepted') {
+                    acceptedInfoEl.innerHTML = 'For more details and updates for your upcoming EVENTS visit us at CORDOVA, KASADYA POBLACION. We\'re open at 8:00AM to 9:00PM';
+                    // Add location link button
+                    const existingBtn = document.getElementById('accepted-location-btn');
+                    if (!existingBtn) {
+                        const link = document.createElement('a');
+                        link.href = 'https://www.google.com/maps/search/?api=1&query=Kasadya+Poblacion+Cordova';
+                        link.target = '_blank';
+                        link.rel = 'noopener';
+                        link.textContent = 'Open Location';
+                        link.className = 'link-btn';
+                        link.id = 'accepted-location-btn';
+                        acceptedInfoEl.parentElement.appendChild(link);
+                    }
+                    acceptedCard.style.display = '';
+                    // Show accepted PH time
+                    const acceptedTimeCard = document.getElementById('accepted-time-card');
+                    const acceptedDT = document.getElementById('modal-accepted-datetime');
+                    try {
+                        // Prefer updated_at/accepted_at if available; fallback to now
+                        const raw = booking.accepted_at || booking.updated_at || booking.created_at || new Date().toISOString();
+                        const date = new Date(raw);
+                        const ph = date.toLocaleString('en-PH', {
+                            year: 'numeric', month: 'long', day: 'numeric',
+                            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true,
+                            timeZone: 'Asia/Manila'
+                        });
+                        acceptedDT.textContent = ph;
+                    } catch (_) {
+                        acceptedDT.textContent = getCurrentPhilippinesDateTime();
+                    }
+                    acceptedTimeCard.style.display = '';
+                } else {
+                    acceptedCard.style.display = 'none';
+                    acceptedInfoEl.textContent = '';
+                    const existingBtn = document.getElementById('accepted-location-btn');
+                    if (existingBtn && existingBtn.parentElement) {
+                        existingBtn.parentElement.removeChild(existingBtn);
+                    }
+                    const acceptedTimeCard = document.getElementById('accepted-time-card');
+                    const acceptedDT = document.getElementById('modal-accepted-datetime');
+                    acceptedTimeCard.style.display = 'none';
+                    acceptedDT.textContent = '';
+                }
+                
+                // Set created date
+                document.getElementById('modal-created-datetime').textContent = formatCreatedDateTime(booking.created_at) || getCurrentPhilippinesDateTime();
+                
+                // Show modal
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('show');
+                }, 10);
+            }
+
+            // Modern Modal functionality
+            const modal = document.getElementById('bookingModal');
+            const closeBtn = document.querySelector('.close-btn');
+
+            function closeModal() {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 400); // Match the CSS transition duration
+            }
+
+            // Close modal when clicking the X button
+            closeBtn.addEventListener('click', closeModal);
+
+            // Close modal when clicking outside of it
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target.classList.contains('modal-backdrop')) {
+                    closeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    closeModal();
+                }
+            });
+
+            // Wire History navigation
+            try {
+                if (historyBtn) {
+                    historyBtn.addEventListener('click', function() {
+                        window.location.href = 'history.html';
+                    });
+                }
+            } catch (_) {}
+
+            // Initial load
+            refresh();
+
+            // Auto-refresh every 15 seconds
+            setInterval(() => {
+                refresh();
+            }, 15000);
+
+            // Refresh when other tabs signal updates
+            window.addEventListener('storage', (e) => {
+                try {
+                    if (e.key === 'events:refresh') {
+                        refresh();
+                    }
+                } catch (_) {}
+            });
+        });
+    </script>
+    <script>
+        (function(){
+            try {
+                function api(url){ return (location && location.protocol === 'file:' ? 'http://localhost:5000' : '') + url; }
+                function resolveLogoUrl(u){
+                    if (!u) return '';
+                    const s = String(u).trim();
+                    if (!s) return '';
+                    if (s.startsWith('/uploads/')) return api(s);
+                    if (/^https?:\/\//i.test(s) || /^data:/i.test(s) || /^file:\/\//i.test(s)) return s;
+                    return s;
+                }
+                let applyTimer = null;
+                async function applyHexLogo(){
+                    let backend = null;
+                    let local = null;
+                    try {
+                        const r = await fetch(api('/api/page-overrides/global'));
+                        if (r.ok) {
+                            const j = await r.json();
+                            backend = (j && j.data) || null;
+                        }
+                    } catch (_) {}
+                    try {
+                        const raw = localStorage.getItem('pageOverrides:global');
+                        if (raw) local = JSON.parse(raw);
+                    } catch (_) {}
+                    const data = Object.assign({}, backend || {}, local || {});
+                    const text = (data && data.hexLogoText) || '';
+                    const bg = (data && data.hexLogoBg) || '';
+                    const color = (data && data.hexLogoTextColor) || '';
+                    if (!text && !bg && !color) return;
+                    const els = document.querySelectorAll('.hex-logo');
+                    els.forEach(el => {
+                        if (text) el.textContent = text;
+                        if (color) el.style.color = color;
+                        if (bg) {
+                            const u = resolveLogoUrl(bg);
+                            if (u) {
+                                el.style.backgroundImage = `url('${u}')`;
+                                el.style.backgroundSize = 'cover';
+                                el.style.backgroundPosition = 'center';
+                                el.style.backgroundColor = 'transparent';
+                            }
+                        }
+                    });
+                }
+                applyHexLogo();
+                try { window.applyHexLogo = applyHexLogo; } catch(_) {}
+                window.addEventListener('storage', (e) => {
+                    if (!e) return;
+                    if (e.key === 'pageOverrides:global') {
+                        if (applyTimer) clearTimeout(applyTimer);
+                        applyTimer = setTimeout(applyHexLogo, 200);
+                    }
+                });
+            } catch (_) {}
+        })();
+    </script>
+</body>
+</html>

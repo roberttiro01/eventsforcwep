@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Dashboard - CWEP</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    
+    <!-- Pending Clients Section -->
+    <div class="pc-wrapper">
+        <div class="pc-card">
+            <div class="pc-header">
+                <h2 class="pc-title">Pending Client</h2>
+                <div class="pc-search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="Search" aria-label="Search pending clients" />
+                </div>
+            </div>
+
+            <div class="pc-table-container">
+                <table class="pc-table">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Couple Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Guests</th>
+                            <th>Reception</th>
+                            <th>Event</th>
+                            <th>Theme</th>
+                            <th>Time</th>
+                            <th>Date</th>
+                            <th>Budget</th>
+                            <th>Downpayment</th>
+                            <th>Bal</th>
+                            <th>Type</th>
+					<th>Payment Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pc-tbody">
+                        <!-- rows will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pc-pagination" style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px;">
+                <div class="pc-page-size" style="font-size:12px;color:#1f1f1f;">5 rows per page</div>
+                <div class="pc-page-info" style="font-size:12px;color:#666;">
+                    <span id="pc-range"></span>
+                </div>
+                <div class="pc-page-nav" style="display:flex;align-items:center;gap:8px;">
+                    <button id="pc-prev" class="pc-btn" style="padding:6px 10px;background:#f3f4f6;color:#333;">Prev</button>
+                    <span id="pc-page" style="font-size:12px;color:#1f1f1f;"></span>
+                    <button id="pc-next" class="pc-btn" style="padding:6px 10px;background:#f3f4f6;color:#333;">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Modal for viewing booking details -->
+    <div id="bookingModal" class="modern-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="header-content">
+                        <div class="header-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="header-text">
+                            <h2>Booking Details</h2>
+                            <p>Complete information about this booking</p>
+                        </div>
+                    </div>
+                    <button class="close-btn" aria-label="Close modal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Full Name</span>
+                                <span class="detail-value" id="modal-full-name">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Couple Name</span>
+                                <span class="detail-value" id="modal-couple-name">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Email</span>
+                                <span class="detail-value" id="modal-email">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Phone</span>
+                                <span class="detail-value" id="modal-phone">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Event Type</span>
+                                <span class="detail-value" id="modal-event-type">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Theme</span>
+                                <span class="detail-value" id="modal-theme">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                    <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Reception</span>
+                                <span class="detail-value" id="modal-reception">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Event Date</span>
+                                <span class="detail-value" id="modal-event-date">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Time Slot</span>
+                                <span class="detail-value" id="modal-time-slot">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Number of Guests</span>
+                                <span class="detail-value" id="modal-guests">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <text x="12" y="16" text-anchor="middle" font-size="16" font-weight="700">₱</text>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Budget</span>
+                                <span class="detail-value" id="modal-budget">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <text x="12" y="16" text-anchor="middle" font-size="16" font-weight="700">₱</text>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Downpayment</span>
+                                <span class="detail-value" id="modal-downpayment">-</span>
+                            </div>
+                        </div>
+                     <div class="detail-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 11H5a2 2 0 0 0-2 2v3c0 1.1.9 2 2 2h4m0-7v7m0-7h10a2 2 0 0 1 2 2v3c0 1.1-.9 2-2 2H9m0-7V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Type</span>
+                                <span class="detail-value" id="modal-type">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card status-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 12l2 2 4-4"></path>
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value status-badge" id="modal-status">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card created-card">
+                            <div class="detail-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2v4"></path>
+                                    <path d="M16 6h4"></path>
+                                    <path d="M18 16v2a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2"></path>
+                                    <path d="M18 8H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2z"></path>
+                                    <path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-label">Created Date & Time</span>
+                                <span class="detail-value" id="modal-created-datetime">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Allow page vertical scrolling so all content can be seen */
+        html, body { height: 100%; overflow-y: auto; }
+
+        .pc-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .pc-card {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(6px);
+            border-radius: 16px;
+            padding: 28px 28px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .pc-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pc-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1e1e1e;
+        }
+
+        .pc-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid rgba(125, 13, 36, 0.25);
+            color: #8c8c8c;
+            min-width: 230px;
+        }
+
+        .pc-search input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 180px;
+            font-size: 14px;
+        }
+
+        .pc-table-container {
+            width: 100%;
+            overflow-x: auto;
+            /* Fit within viewport, accounting for header + paddings + pagination */
+            max-height: none;
+            overflow-y: visible;
+            /* Show horizontal scrollbar for better navigation */
+            scrollbar-width: thin;            /* Firefox */
+            -ms-overflow-style: scrollbar;    /* IE 10+ */
+        }
+        .pc-table-container::-webkit-scrollbar { /* Chrome/Safari/Edge */
+            width: 8px;
+            height: 8px;
+        }
+        .pc-table-container::-webkit-scrollbar-track {
+            background: rgba(125, 13, 36, 0.1);
+            border-radius: 4px;
+        }
+        .pc-table-container::-webkit-scrollbar-thumb {
+            background: rgba(125, 13, 36, 0.3);
+            border-radius: 4px;
+        }
+        .pc-table-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(125, 13, 36, 0.5);
+        }
+
+        .pc-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #1f1f1f;
+            table-layout: auto;
+            min-width: 1200px; /* Ensure table is wide enough to show all columns */
+        }
+
+        .pc-table thead th {
+            font-weight: 700;
+            text-align: left;
+            font-size: 12px;
+            color: #7d0d24;
+            padding: 10px 8px;
+            white-space: nowrap;
+        }
+
+        .pc-table tbody td {
+            padding: 10px 8px;
+            border-top: 2px solid rgba(125, 13, 36, 0.35);
+            font-size: 12px;
+            overflow: visible;
+            text-overflow: unset;
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 150px;
+        }
+
+
+        /* Status column styling */
+        .pc-table tbody td:last-child {
+            overflow: visible;
+            white-space: normal;
+        }
+
+        .pc-table tbody tr:last-child td {
+            border-bottom: 2px solid rgba(125, 13, 36, 0.35);
+        }
+
+        .pc-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .pc-badge-accepted {
+            background: #d4f5df;
+            color: #168a3b;
+        }
+
+        .pc-badge-pending {
+            background: #eaf3ff;
+            color: #2c62d6;
+        }
+
+        .pc-badge-deleted {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .pc-badge-cancelled {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+
+        .pc-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pc-btn-accept {
+            background: #28a745;
+            color: white;
+            padding: 6px 10px;
+            font-size: 10px;
+            min-width: 50px;
+        }
+
+        .pc-btn-accept:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .pc-btn-cancel {
+            background: #ffc107;
+            color: #212529;
+            padding: 6px 10px;
+            font-size: 10px;
+            min-width: 50px;
+        }
+
+        .pc-btn-cancel:hover {
+            background: #e0a800;
+            transform: scale(1.05);
+        }
+
+        .pc-btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 6px 10px;
+            font-size: 10px;
+            min-width: 50px;
+        }
+
+        .pc-btn-delete:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+
+        .status-indicator.accepted {
+            background: #d4f5df;
+            color: #168a3b;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-indicator.cancelled {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Modern Modal Styles */
+        .modern-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .modal-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modern-modal.show .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 32px 24px;
+            background: linear-gradient(135deg, rgba(125, 13, 36, 0.08), rgba(125, 13, 36, 0.04));
+            border-bottom: 1px solid rgba(125, 13, 36, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #7d0d24, #a0152e);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(125, 13, 36, 0.3);
+        }
+
+        .header-text h2 {
+            color: #1a1a1a;
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.02em;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .close-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+            transform: scale(1.05);
+        }
+
+        .modal-body {
+            padding: 32px;
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #7d0d24, #a0152e);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .detail-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(125, 13, 36, 0.1), rgba(125, 13, 36, 0.05));
+            border-radius: 12px;
+            color: #7d0d24;
+            flex-shrink: 0;
+        }
+
+        .detail-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            color: #1a1a1a;
+            font-size: 16px;
+            font-weight: 600;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .status-card {
+            background: linear-gradient(145deg, rgba(125, 13, 36, 0.05), rgba(125, 13, 36, 0.02));
+        }
+
+        .created-card {
+            background: linear-gradient(145deg, rgba(34, 197, 94, 0.05), rgba(34, 197, 94, 0.02));
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            grid-column: 1 / -1;
+            justify-self: center;
+            max-width: 400px;
+        }
+
+        .created-card .detail-icon {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+            color: #22c55e;
+        }
+
+        .created-card::before {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .dp-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .dp-btn {
+            padding: 8px 12px;
+            background: #7d0d24;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .dp-btn:hover {
+            background: #a0152e;
+        }
+
+        /* Custom scrollbar */
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(125, 13, 36, 0.3);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(125, 13, 36, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .modal-container {
+                padding: 10px;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .modal-header {
+                padding: 20px 16px 16px;
+            }
+            
+            .header-text h2 {
+                font-size: 22px;
+            }
+            
+            .header-text p {
+                font-size: 13px;
+            }
+            
+            .modal-body {
+                padding: 16px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .detail-card {
+                padding: 14px;
+                border-radius: 12px;
+            }
+            
+            .detail-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .detail-label {
+                font-size: 11px;
+            }
+            
+            .detail-value {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-container {
+                padding: 5px;
+                padding-top: 10px;
+            }
+            
+            .modal-content {
+                border-radius: 16px;
+                max-height: 98vh;
+            }
+            
+            .modal-header {
+                padding: 16px 12px 12px;
+            }
+            
+            .header-content {
+                gap: 10px;
+            }
+            
+            .header-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 12px;
+            }
+            
+            .header-text h2 {
+                font-size: 18px;
+            }
+            
+            .header-text p {
+                font-size: 12px;
+            }
+            
+            .close-btn {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+            }
+            
+            .modal-body {
+                padding: 12px;
+                max-height: calc(98vh - 80px);
+            }
+            
+            .detail-card {
+                padding: 12px;
+                gap: 12px;
+            }
+            
+            .detail-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
+            }
+            
+            .detail-label {
+                font-size: 10px;
+            }
+            
+            .detail-value {
+                font-size: 13px;
+                line-height: 1.3;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .modal-header {
+                padding: 12px 10px 10px;
+            }
+            
+            .header-text h2 {
+                font-size: 16px;
+            }
+            
+            .header-text p {
+                font-size: 11px;
+            }
+            
+            .modal-body {
+                padding: 10px;
+            }
+            
+            .detail-card {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .detail-icon {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .detail-label {
+                font-size: 9px;
+            }
+            
+            .detail-value {
+                font-size: 12px;
+            }
+        }
+
+        /* Modal landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal-container {
+                padding: 5px;
+                align-items: flex-start;
+                padding-top: 5px;
+            }
+            
+            .modal-content {
+                max-height: 95vh;
+            }
+            
+            .modal-header {
+                padding: 12px 16px 8px;
+            }
+            
+            .header-text h2 {
+                font-size: 16px;
+            }
+            
+            .modal-body {
+                padding: 12px 16px;
+                max-height: calc(95vh - 60px);
+            }
+            
+            .details-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .detail-card {
+                padding: 8px;
+            }
+        }
+
+
+        /* Mobile-first responsive design */
+        @media (max-width: 1024px) {
+            .pc-card {
+                padding: 20px 16px;
+                margin: 10px;
+                border-radius: 12px;
+            }
+            
+            .pc-title {
+                font-size: 22px;
+            }
+            
+            .pc-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+            
+            .pc-search {
+                min-width: auto;
+                width: 100%;
+                max-width: 300px;
+                align-self: center;
+            }
+            
+            .pc-search input {
+                width: 100%;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pc-wrapper {
+                padding: 10px;
+                min-height: 100vh;
+            }
+            
+            .pc-card {
+                padding: 16px 12px;
+                max-width: 100%;
+                background: rgba(255,255,255,0.95);
+            }
+            
+            .pc-title {
+                font-size: 20px;
+                text-align: center;
+            }
+            
+            .pc-table-container {
+                max-height: none;
+                border-radius: 8px;
+                overflow-x: auto;
+                overflow-y: visible;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .pc-table {
+                min-width: 1000px; /* Ensure horizontal scroll on mobile */
+                font-size: 11px;
+            }
+            
+            .pc-table thead th {
+                font-size: 10px;
+                padding: 8px 4px;
+                white-space: nowrap;
+                position: sticky;
+                top: 0;
+                background: rgba(255,255,255,0.95);
+                backdrop-filter: blur(5px);
+                z-index: 10;
+            }
+            
+            .pc-table tbody td {
+                padding: 8px 4px;
+                font-size: 10px;
+                max-width: 120px;
+                word-break: break-word;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 2px;
+                min-width: 80px;
+            }
+            
+            .pc-btn {
+                font-size: 9px;
+                padding: 4px 8px;
+                min-width: 45px;
+            }
+            
+            .status-indicator {
+                font-size: 8px;
+                padding: 4px 6px;
+                white-space: nowrap;
+            }
+            
+            .pc-pagination {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 0;
+                text-align: center;
+            }
+            
+            .pc-page-nav {
+                justify-content: center;
+                gap: 12px;
+            }
+            
+            .pc-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .pc-wrapper {
+                padding: 5px;
+            }
+            
+            .pc-card {
+                padding: 12px 8px;
+                border-radius: 8px;
+            }
+            
+            .pc-title {
+                font-size: 18px;
+            }
+            
+            .pc-search {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+            
+            .pc-search input {
+                font-size: 13px;
+                min-width: 150px;
+            }
+            
+            .pc-table-container {
+                max-height: none;
+            }
+            
+            .pc-table {
+                font-size: 10px;
+            }
+            
+            .pc-table thead th {
+                font-size: 9px;
+                padding: 6px 3px;
+            }
+            
+            .pc-table tbody td {
+                padding: 6px 3px;
+                font-size: 9px;
+                max-width: 100px;
+            }
+            
+            .action-buttons {
+                min-width: 70px;
+            }
+            
+            .pc-btn {
+                font-size: 8px;
+                padding: 3px 6px;
+                min-width: 40px;
+            }
+            
+            .status-indicator {
+                font-size: 7px;
+                padding: 3px 5px;
+            }
+            
+            .pc-page-info {
+                font-size: 11px;
+            }
+            
+            .pc-page-size {
+                font-size: 11px;
+            }
+        }
+
+        /* iPhone specific optimizations */
+        @media (max-width: 414px) and (-webkit-min-device-pixel-ratio: 2) {
+            .pc-table-container {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+            
+            .pc-btn {
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+        }
+
+        /* Very small screens (iPhone SE, older Android) */
+        @media (max-width: 375px) {
+            .pc-title {
+                font-size: 16px;
+            }
+            
+            .pc-table {
+                font-size: 9px;
+            }
+            
+            .pc-table thead th {
+                font-size: 8px;
+                padding: 5px 2px;
+            }
+            
+            .pc-table tbody td {
+                padding: 5px 2px;
+                font-size: 8px;
+                max-width: 80px;
+            }
+            
+            .action-buttons {
+                min-width: 60px;
+            }
+            
+            .pc-btn {
+                font-size: 7px;
+                padding: 2px 4px;
+                min-width: 35px;
+            }
+        }
+
+        /* Landscape mode for phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .pc-wrapper {
+                padding: 5px;
+            }
+            
+            .pc-card {
+                padding: 10px;
+            }
+            
+            .pc-title {
+                font-size: 16px;
+            }
+            
+            .pc-table-container {
+                max-height: none;
+            }
+            
+            .pc-header {
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+    <!-- SweetAlert2 for modals like update page -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Modal helpers matching update pages
+        function notifySuccess(message){
+            if (window.Swal && Swal.fire) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: String(message||''),
+                    showConfirmButton: false,
+                    timer: 1400,
+                    timerProgressBar: true,
+                    position: 'center'
+                });
+            } else { alert(String(message||'')); }
+        }
+        function notifyError(message){
+            if (window.Swal && Swal.fire) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: String(message||''),
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#1d4ed8'
+                });
+            } else { alert(String(message||'')); }
+        }
+        async function confirmAction(message){
+            if (window.Swal && Swal.fire) {
+                const r = await Swal.fire({
+                    icon: 'warning',
+                    title: 'Are you sure?',
+                    text: String(message || ''),
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, continue',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonText: 'Cancel'
+                });
+                return !!r.isConfirmed;
+            }
+            return Promise.resolve(confirm(String(message || '')));
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.getElementById('pc-tbody');
+            const searchInput = document.querySelector('.pc-search input');
+            let searchBound = false;
+
+            // Pagination state
+            const prevBtn = document.getElementById('pc-prev');
+            const nextBtn = document.getElementById('pc-next');
+            const pageSpan = document.getElementById('pc-page');
+            const rangeSpan = document.getElementById('pc-range');
+            let allRowsData = [];
+            let filteredRowsData = [];
+            let currentPage = 1;
+            let rowsPerPage = 5;
+
+            function formatTimeDisplay(raw) {
+                if (!raw) return '';
+                const value = String(raw).trim();
+
+                // Try patterns with am/pm already present
+                const ampmMatch = value.match(/^(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?|am|pm)$/i);
+                if (ampmMatch) {
+                    let hour = parseInt(ampmMatch[1], 10);
+                    let minute = ampmMatch[2] !== undefined ? parseInt(ampmMatch[2], 10) : 0;
+                    const suffixRaw = ampmMatch[3].toLowerCase();
+                    const suffix = suffixRaw.startsWith('a') ? 'Am' : 'Pm';
+                    if (hour === 0) hour = 12;
+                    if (hour > 12) hour = hour % 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour}:${mm}${suffix}`;
+                }
+
+                // 24-hour formats like 14:05 or 9:5 or 09:05 or just 14
+                const h24Match = value.match(/^(2[0-3]|[01]?\d)(?::([0-5]?\d))?$/);
+                if (h24Match) {
+                    let hour24 = parseInt(h24Match[1], 10);
+                    let minute = h24Match[2] !== undefined ? parseInt(h24Match[2], 10) : 0;
+                    const isPm = hour24 >= 12;
+                    let hour12 = hour24 % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour12}:${mm}${isPm ? 'Pm' : 'Am'}`;
+                }
+
+                // Common textual formats like "14:00:00" or with seconds
+                const hmsMatch = value.match(/^(2[0-3]|[01]?\d):([0-5]\d):([0-5]\d)$/);
+                if (hmsMatch) {
+                    let hour24 = parseInt(hmsMatch[1], 10);
+                    let minute = parseInt(hmsMatch[2], 10);
+                    const isPm = hour24 >= 12;
+                    let hour12 = hour24 % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour12}:${mm}${isPm ? 'Pm' : 'Am'}`;
+                }
+
+                // Fallback: try Date parsing (last resort) and format
+                const parsed = new Date(`1970-01-01T${value}`);
+                if (!isNaN(parsed.getTime())) {
+                    let hour24 = parsed.getHours();
+                    const minute = parsed.getMinutes();
+                    const isPm = hour24 >= 12;
+                    let hour12 = hour24 % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const mm = String(minute).padStart(2, '0');
+                    return `${hour12}:${mm}${isPm ? 'Pm' : 'Am'}`;
+                }
+
+                // If all else fails, return the original value
+                return value;
+            }
+
+            function formatBudgetCommas(raw) {
+                if (raw === null || raw === undefined) return '';
+                const stringValue = String(raw).trim();
+                const numericString = stringValue.replace(/,/g, '').replace(/[^0-9.]/g, '');
+                const amount = parseFloat(numericString);
+                if (isNaN(amount)) return stringValue;
+                const hasDecimal = numericString.includes('.') && numericString.split('.')[1].length > 0;
+                return amount.toLocaleString('en-US', {
+                    minimumFractionDigits: hasDecimal ? 2 : 0,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            // Parse a money-like value (e.g. "1,000", "₱1,000.50") into a Number
+            
+
+            function formatCreatedDateTime(raw) {
+                if (!raw) return '';
+                
+                try {
+                    // Handle different date formats
+                    let date;
+                    
+                    // If it's a timestamp (number)
+                    if (typeof raw === 'number' || /^\d+$/.test(String(raw))) {
+                        date = new Date(parseInt(raw));
+                    }
+                    // If it's already a Date object or ISO string
+                    else {
+                        date = new Date(raw);
+                    }
+                    
+                    // Check if date is valid
+                    if (isNaN(date.getTime())) {
+                        return '';
+                    }
+                    
+                    // Format the date and time for Philippines timezone
+                    const options = {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true,
+                        timeZone: 'Asia/Manila'
+                    };
+                    
+                    return date.toLocaleDateString('en-US', options);
+                } catch (error) {
+                    console.error('Error formatting date:', error);
+                    return '';
+                }
+            }
+
+            function getCurrentPhilippinesDateTime() {
+                const now = new Date();
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Manila'
+                };
+                return now.toLocaleDateString('en-US', options);
+            }
+
+            let currentRowsData = []; // Store current page rows for modal lookup
+
+            function updatePaginationControls(total) {
+                const totalPages = Math.max(1, Math.ceil(total / rowsPerPage));
+                currentPage = Math.min(currentPage, totalPages);
+                const start = total === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+                const end = Math.min(total, currentPage * rowsPerPage);
+                
+                if (pageSpan) pageSpan.textContent = `${currentPage} / ${totalPages}`;
+                if (rangeSpan) rangeSpan.textContent = `${start}-${end} of ${total}`;
+                if (prevBtn) {
+                prevBtn.disabled = currentPage <= 1;
+                    prevBtn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+                }
+                if (nextBtn) {
+                nextBtn.disabled = currentPage >= totalPages;
+                    nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+                }
+            }
+
+            function renderTablePage(rows) {
+                tbody.innerHTML = '';
+                const startIdx = (currentPage - 1) * rowsPerPage;
+                const pageRows = rows.slice(startIdx, startIdx + rowsPerPage);
+                renderRows(pageRows);
+                currentRowsData = pageRows;
+                updatePaginationControls(rows.length);
+            }
+
+            function applySearchAndRender() {
+                const term = (searchInput?.value || '').toLowerCase().trim();
+                if (!term) {
+                    filteredRowsData = allRowsData.slice();
+                } else {
+                    filteredRowsData = allRowsData.filter(b => {
+                        const values = [
+                            b.full_name || b.Full_name || '',
+                            b.couple_name || b.Couple_name || '',
+                            b.email || b.Email || '',
+                            b.reception || b.Reception || '',
+                            b.event_type || b.Choose_your_event || '',
+                            b.theme || b.Theme || '',
+                            b.time_slot || b.Time || '',
+                            b.event_date || b.Date || '',
+                            b.budget || b.Budget || '',
+                            b.phone || b.Contact_number || '',
+                            b.guests || b.Number_of_guest || '',
+                            b.type || b.Type || '',
+                            b.payment_status || '',
+                            b.status || 'pending'
+                        ].map(v => String(v).toLowerCase()).join(' ');
+                        return values.includes(term);
+                    });
+                }
+                currentPage = 1;
+                renderTablePage(filteredRowsData);
+            }
+
+
+            function renderRows(rows) {
+                console.log('Rendering rows:', rows);
+                // tbody innerHTML is managed by renderTablePage
+                rows.forEach((row, index) => {
+                    console.log(`Row ${index}:`, row);
+                    
+                    const tr = document.createElement('tr');
+                    const status = (row.status || 'pending').toLowerCase();
+                    const id = row.id || row.Id || null;
+                    const fullName = String(row.full_name || row.Full_name || '').trim();
+                    const email = String(row.email || row.Email || '').trim();
+                    const eventDate = String(row.event_date || row.Date || '').trim();
+                    const timeSlot = String(row.time_slot || row.Time || '').trim();
+                    const key = (row.key && String(row.key).trim()) || [fullName, email, eventDate, timeSlot].join('-');
+                    const fullNameSafe = row.full_name || row.Full_name || '';
+                    const coupleNameSafe = row.couple_name || row.Couple_name || '';
+                    const emailSafe = row.email || row.Email || '';
+                    const receptionSafe = row.reception || row.Reception || '';
+                    const eventTypeSafe = row.event_type || row.Choose_your_event || '';
+                    const themeSafe = row.theme || row.Theme || '';
+                    const timeSafe = formatTimeDisplay(row.time_slot || row.Time || '');
+                    const dateSafe = row.event_date || row.Date || '';
+                    const budgetSafe = formatBudgetCommas(row.budget || row.Budget || '');
+                    // Prefer DB downpayment; if empty, fallback to localStorage payments by key or by email|date
+                    let downpaymentValue = row.downpayment || row.Downpayment || '';
+                    try {
+                        if (downpaymentValue === '' || downpaymentValue === null || downpaymentValue === undefined) {
+                            const storeRaw = localStorage.getItem('payments');
+                            if (storeRaw) {
+                                const store = JSON.parse(storeRaw);
+                                const record = store[key];
+                                if (record && typeof record.amount !== 'undefined') {
+                                    downpaymentValue = record.amount;
+                                }
+                            }
+                            if (downpaymentValue === '' || downpaymentValue === null || downpaymentValue === undefined) {
+                                const idxRaw = localStorage.getItem('paymentsIndex');
+                                if (idxRaw) {
+                                    const idx = JSON.parse(idxRaw);
+                                    const idxKey = [String(emailSafe).trim(), String(dateSafe).trim()].join('|');
+                                    const idxRecord = idx[idxKey];
+                                    if (idxRecord && typeof idxRecord.amount !== 'undefined') {
+                                        downpaymentValue = idxRecord.amount;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (_) {}
+                    const downpaymentSafe = formatBudgetCommas(downpaymentValue);
+                    
+                    const phoneSafe = row.phone || row.Contact_number || '';
+                    const guestsSafe = row.guests || row.Number_of_guest || '';
+                    const typeSafe = row.type || row.Type || '';
+
+                    
+
+                    // Compute balance = budget - downpayment (fallbacks handled above)
+                    let balanceValue = '';
+                    try {
+                        const budNum = parseFloat(String(budgetSafe).replace(/,/g, ''));
+                        const downNum = parseFloat(String(downpaymentSafe).replace(/,/g, ''));
+                        if (!isNaN(budNum)) {
+                            const diff = budNum - (isNaN(downNum) ? 0 : downNum);
+                            balanceValue = diff.toLocaleString('en-US', { maximumFractionDigits: 2 });
+                        }
+                    } catch (_) {}
+                    const balanceDisplay = balanceValue ? `₱${balanceValue}` : '';
+
+                    // Generate action buttons based on status
+                    let actionButtons = '';
+                    if (status === 'accepted') {
+                        actionButtons = `
+                            <div class="action-buttons">
+                                <span class="status-indicator accepted">Accepted</span>
+                                <button class="pc-btn pc-btn-delete" type="button" 
+                                        data-id="${id !== null ? id : ''}" 
+                                        data-key="${key}"
+                                        data-full-name="${fullName.replace(/"/g, '&quot;')}"
+                                        data-email="${email.replace(/"/g, '&quot;')}"
+                                        data-event-date="${eventDate.replace(/"/g, '&quot;')}"
+                                        data-time-slot="${timeSlot.replace(/"/g, '&quot;')}"
+                                        title="Trash Booking"
+                                >
+                                    Trash
+                                </button>
+                            </div>
+                        `;
+                    } else if (status === 'cancelled') {
+                        actionButtons = `
+                            <div class="action-buttons">
+                                <span class="status-indicator cancelled">Cancelled</span>
+                                <button class="pc-btn pc-btn-delete" type="button" 
+                                        data-id="${id !== null ? id : ''}" 
+                                        data-key="${key}"
+                                        data-full-name="${fullName.replace(/"/g, '&quot;')}"
+                                        data-email="${email.replace(/"/g, '&quot;')}"
+                                        data-event-date="${eventDate.replace(/"/g, '&quot;')}"
+                                        data-time-slot="${timeSlot.replace(/"/g, '&quot;')}"
+                                        title="Trash Booking"
+                                >
+                                    Trash
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        // Pending status - show all action buttons
+                        actionButtons = `
+                            <div class="action-buttons">
+                                <button class="pc-btn pc-btn-accept" type="button" 
+                                        data-id="${id !== null ? id : ''}" 
+                                        data-key="${key}"
+                                        data-full-name="${fullName.replace(/"/g, '&quot;')}"
+                                        data-email="${email.replace(/"/g, '&quot;')}"
+                                        data-event-date="${eventDate.replace(/"/g, '&quot;')}"
+                                        data-time-slot="${timeSlot.replace(/"/g, '&quot;')}"
+                                        title="Accept Booking"
+                                >
+                                    Accept
+                                </button>
+                                <button class="pc-btn pc-btn-cancel" type="button" 
+                                        data-id="${id !== null ? id : ''}" 
+                                        data-key="${key}"
+                                        data-full-name="${fullName.replace(/"/g, '&quot;')}"
+                                        data-email="${email.replace(/"/g, '&quot;')}"
+                                        data-event-date="${eventDate.replace(/"/g, '&quot;')}"
+                                        data-time-slot="${timeSlot.replace(/"/g, '&quot;')}"
+                                        title="Cancel Booking"
+                                >
+                                    Cancel
+                                </button>
+                                <button class="pc-btn pc-btn-delete" type="button" 
+                                        data-id="${id !== null ? id : ''}" 
+                                        data-key="${key}"
+                                        data-full-name="${fullName.replace(/"/g, '&quot;')}"
+                                        data-email="${email.replace(/"/g, '&quot;')}"
+                                        data-event-date="${eventDate.replace(/"/g, '&quot;')}"
+                                        data-time-slot="${timeSlot.replace(/"/g, '&quot;')}"
+                                        title="Trash Booking"
+                                >
+                                    Trash
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    tr.innerHTML = `
+                        <td>${fullNameSafe}</td>
+                        <td>${coupleNameSafe}</td>
+                        <td>${emailSafe}</td>
+                        <td>${phoneSafe}</td>
+                        <td>${guestsSafe}</td>
+                        <td>${receptionSafe}</td>
+                        <td>${eventTypeSafe}</td>
+                        <td>${themeSafe}</td>
+                        <td>${timeSafe}</td>
+                        <td>${dateSafe}</td>
+                        <td>₱${budgetSafe}</td>
+                        <td>₱${downpaymentSafe}</td>
+                        <td>${balanceDisplay}</td>
+                        <td>${typeSafe}</td>
+                        <td>
+                            ${(() => {
+                                const normalizePayStatus = (raw) => {
+                                    if (raw === null || raw === undefined) return '';
+                                    let s = String(raw).trim().toLowerCase();
+                                    // remove leading noise like symbols or single-letter prefixes repeatedly
+                                    s = s.replace(/^[^a-z0-9]+/g, '');
+                                    s = s.replace(/^[a-z]\s+/g, '');
+                                    // robust substring checks - check for exact patterns first
+                                    if (s.includes('awaiting_payment_action') || s.includes('awaiting payment action')) return 'awaiting_payment_action';
+                                    if (s.includes('awaiting_next_action') || s.includes('awaiting next action')) return 'awaiting_next_action';
+                                    if (s.includes('awaiting_payment_method') || s.includes('awaiting payment method')) return 'awaiting_payment_method';
+                                    if (s.includes('await')) return s.includes('next') ? 'awaiting_next_action' : 'awaiting_payment_method';
+                                    if (s.includes('pend')) return 'pending';
+                                    if (s.includes('process')) return 'processing';
+                                    if (s.includes('expired')) return 'failed';
+                                    if (s.includes('fail')) return 'failed';
+                                    if (s.includes('cancel')) return 'cancelled';
+                                    if (s.includes('paid') || s.includes('success')) return 'succeeded';
+                                    return s;
+                                };
+                                const psn = normalizePayStatus(row.payment_status);
+                                // Debug: log the raw value and normalized result
+                                console.log('Payment Status Debug:', { raw: row.payment_status, normalized: psn });
+                                if (psn === 'succeeded') {
+                                    return '<span style="color: green; font-weight: bold;">Success</span>';
+                                }
+                                if (psn === 'failed' || psn === 'cancelled' || psn === 'canceled') {
+                                    const text = psn.charAt(0).toUpperCase() + psn.slice(1);
+                                    return text;
+                                }
+                                if (psn === 'awaiting_next_action') {
+                                    return 'Awaiting Next Action';
+                                }
+                                if (psn === 'awaiting_payment_action') {
+                                    return 'Awaiting Payment Action';
+                                }
+                                if (psn === 'awaiting_payment_method') {
+                                    return '<span style="color: red; font-weight: bold;">Awaiting Payment Action</span>';
+                                }
+                                // For any other state (processing, pending, empty, unknown) show Pending
+                                return 'Pending';
+                            })()}
+                        </td>
+                        <td>
+                            ${actionButtons}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+
+                // Wire Action button event handlers
+                tbody.querySelectorAll('.pc-btn-accept').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const btnEl = e.currentTarget;
+                        const bookingId = btnEl && btnEl.dataset ? btnEl.dataset.id : '';
+                        const fullName = btnEl && btnEl.dataset ? btnEl.dataset.fullName : '';
+                        const proceed = await confirmAction(`Accept the booking for ${fullName}?`);
+                        if (proceed) {
+                            updateBookingStatus(bookingId, 'accepted', btnEl);
+                        }
+                    });
+                });
+
+                tbody.querySelectorAll('.pc-btn-cancel').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const btnEl = e.currentTarget;
+                        const bookingId = btnEl && btnEl.dataset ? btnEl.dataset.id : '';
+                        const fullName = btnEl && btnEl.dataset ? btnEl.dataset.fullName : '';
+                        const proceed = await confirmAction(`Cancel the booking for ${fullName}?`);
+                        if (proceed) {
+                            updateBookingStatus(bookingId, 'cancelled', btnEl);
+                        }
+                    });
+                });
+
+                tbody.querySelectorAll('.pc-btn-delete').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const btnEl = e.currentTarget;
+                        const bookingId = btnEl && btnEl.dataset ? btnEl.dataset.id : '';
+                        const fullName = btnEl && btnEl.dataset ? btnEl.dataset.fullName : '';
+                        const proceed = await confirmAction(`Permanently trash the booking for ${fullName}? This cannot be undone.`);
+                        if (proceed) {
+                            deleteBooking(bookingId, btnEl);
+                        }
+                    });
+                });
+            }
+
+            async function updateBookingStatus(bookingId, status, buttonElement) {
+                try {
+                    // Show loading state on button
+                    const originalText = buttonElement ? buttonElement.textContent : '';
+                    if (buttonElement) { buttonElement.textContent = 'Loading...'; buttonElement.disabled = true; }
+
+                    const response = await fetch(`http://localhost:4400/api/book/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: bookingId, status: status })
+                    });
+
+                    if (response.ok) {
+                        // Success - refresh the table to show updated data
+                        refresh();
+                        notifySuccess(`Booking ${status} successfully!`);
+                        
+                        // Signal other tabs to refresh (cross-tab communication)
+                        localStorage.setItem('events:refresh', Date.now().toString());
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `Failed to ${status} booking`);
+                    }
+                } catch (error) {
+                    console.error(`Error updating booking status:`, error);
+                    notifyError(error.message || 'Failed to update booking status');
+                    
+                    // Restore button state on error
+                    try {
+                        if (buttonElement) { buttonElement.textContent = originalText; buttonElement.disabled = false; }
+                    } catch (_) {}
+                }
+            }
+
+            async function deleteBooking(bookingId, buttonElement) {
+                try {
+                    // Show loading state on button
+                    const originalText = buttonElement ? buttonElement.textContent : '';
+                    if (buttonElement) { buttonElement.textContent = 'Deleting...'; buttonElement.disabled = true; }
+
+                    const response = await fetch(`http://localhost:4400/api/book/delete`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: bookingId })
+                    });
+
+                    if (response.ok) {
+                        // Success - refresh the table to show updated data
+                        refresh();
+                        notifySuccess('Booking trashed successfully');
+                        
+                        // Signal other tabs to refresh (cross-tab communication)
+                        localStorage.setItem('events:refresh', Date.now().toString());
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to delete booking');
+                    }
+                } catch (error) {
+                    console.error('Error deleting booking:', error);
+                    notifyError(error.message || 'Failed to trash booking');
+                    
+                    // Restore button state on error
+                    try {
+                        if (buttonElement) { buttonElement.textContent = originalText; buttonElement.disabled = false; }
+                    } catch (_) {}
+                }
+            }
+
+            async function refresh() {
+            fetch('http://localhost:4400/api/book')
+                .then(r => r.json())
+                .then(async data => {
+                    const book = data.bookings || data.data || [];
+                    console.log('Received booking data:', book);
+                    console.log('Number of bookings:', book.length);
+
+                    allRowsData = book;
+                    filteredRowsData = allRowsData.slice();
+                    currentPage = 1;
+                    renderTablePage(filteredRowsData);
+
+                    // simple client-side search
+                    if (!searchBound) {
+                        searchInput.addEventListener('input', function() {
+                            applySearchAndRender();
+                        });
+                        searchBound = true;
+
+                        // Pagination wiring
+                        if (prevBtn) {
+                        prevBtn.addEventListener('click', () => {
+                            if (currentPage > 1) {
+                                currentPage -= 1;
+                                renderTablePage(filteredRowsData);
+                            }
+                        });
+                        }
+                        if (nextBtn) {
+                        nextBtn.addEventListener('click', () => {
+                            const totalPages = Math.max(1, Math.ceil(filteredRowsData.length / rowsPerPage));
+                            if (currentPage < totalPages) {
+                                currentPage += 1;
+                                renderTablePage(filteredRowsData);
+                            }
+                        });
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load book', err);
+                });
+            }
+
+            // Modern Modal functionality
+            const modal = document.getElementById('bookingModal');
+            const closeBtn = document.querySelector('.close-btn');
+
+            function closeModal() {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 400); // Match the CSS transition duration
+            }
+
+            // Close modal when clicking the X button
+            closeBtn.addEventListener('click', closeModal);
+
+            // Close modal when clicking outside of it
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target.classList.contains('modal-backdrop')) {
+                    closeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    closeModal();
+                }
+            });
+
+            // Initial load
+            refresh();
+
+            // Auto-refresh every 15 seconds
+            setInterval(() => {
+                refresh();
+            }, 15000);
+
+            // Refresh when other tabs signal updates
+            window.addEventListener('storage', (e) => {
+                try {
+                    if (e.key === 'events:refresh') {
+                        refresh();
+                    }
+                } catch (_) {}
+            });
+        });
+    </script>
+</body>
+</html>

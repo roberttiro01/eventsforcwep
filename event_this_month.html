@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --accent-red: #e23c3c;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-dark: #0f172a;
+            --muted: #64748b;
+            --ring: rgba(30, 58, 138, 0.25);
+            --grad-a: #f0f7ff;
+            --grad-b: #fff7f7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', Arial, sans-serif;
+            color: var(--text-dark);
+            background: radial-gradient(1200px 600px at 10% -10%, var(--grad-a), transparent),
+                        radial-gradient(1200px 600px at 110% 10%, var(--grad-b), transparent), #ffffff;
+        }
+
+        /* Ensure vertical scrollbar appears when content overflows */
+        html, body { height: 100%; overflow-y: auto; }
+
+        .page {
+            max-width: 1100px;
+            margin: 40px auto 80px auto;
+            padding: 0 24px 24px 24px;
+            flex-wrap: wrap;
+        }
+
+        .title {
+            text-align: center;
+            letter-spacing: 0.5px;
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin: 40px 0 8px 0;
+            font-size: clamp(26px, 5vw, 40px);
+            text-shadow: 0 1px 0 #fff;
+        }
+
+        .title span { color: var(--accent-red); }
+
+        .month {
+            margin: 20px 0 6px 0;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: clamp(18px, 3vw, 28px);
+        }
+
+        .month .year { color: var(--muted); margin-left: 6px; font-weight: 600; }
+
+        .event-count {
+            margin: 8px 0 22px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #fff, #f8fafc);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+            color: var(--text-dark);
+            font-weight: 700;
+            letter-spacing: .2px;
+            user-select: none;
+        }
+
+        .controls {
+            margin: 14px 0 26px 0;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 12px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(2, 6, 23, 0.06);
+            border-radius: 14px;
+            backdrop-filter: saturate(1.4) blur(6px);
+        }
+
+        .controls label { font-weight: 700; color: var(--primary-blue); }
+
+        .controls select {
+            padding: 10px 40px 10px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>') no-repeat right 12px center;
+            color: var(--text-dark);
+            appearance: none;
+            outline: none;
+            transition: box-shadow .15s ease, border-color .15s ease, transform .15s ease;
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+        }
+
+        .controls select:hover { transform: translateY(-1px); }
+        .controls select:focus { box-shadow: 0 0 0 4px var(--ring); border-color: var(--primary-blue); }
+
+        .list { display: grid; gap: 16px; }
+
+        .card {
+            display: grid;
+            grid-template-columns: 1.2fr 1.6fr 1.6fr auto;
+            align-items: center;
+            background: linear-gradient(180deg, #ffffff, #fafafb);
+            padding: clamp(14px, 2.2vw, 20px) clamp(16px, 2.6vw, 22px);
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp .35s ease both;
+            flex-wrap: wrap;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(30,58,138,0.06), transparent 20%, transparent 80%, rgba(226,60,60,0.06));
+            pointer-events: none;
+        }
+
+        .card:hover { box-shadow: 0 18px 40px rgba(2, 6, 23, 0.12); transform: translateY(-2px); transition: all .18s ease; }
+
+        .date, .type, .details { display: flex; align-items: center; gap: 10px; }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #1e3a8a;
+            font-weight: 700;
+            font-size: clamp(13px, 1.8vw, 16px);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+        }
+
+        .date .pill { background: #ecfeff; color: #0e7490; }
+        .type .pill { background: #fff1f2; color: #be123c; text-transform: uppercase; letter-spacing: .5px; }
+
+        .details .primary { font-weight: 800; font-size: clamp(16px, 2.2vw, 22px); }
+        .details .secondary { color: var(--muted); font-weight: 600; font-size: clamp(12px, 1.6vw, 14px); }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        .delete-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .delete-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .empty {
+            border: 1px dashed var(--card-border);
+            border-radius: 14px;
+            padding: 28px;
+            color: var(--muted);
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+        }
+
+        @media (max-width: 860px) {
+            .card { 
+                grid-template-columns: 1fr; 
+                row-gap: 10px; 
+                display: flex;
+                flex-direction: column;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            .details { justify-content: flex-start; }
+            .delete-btn { 
+                justify-self: flex-start; 
+                align-self: flex-end;
+                margin-top: 10px;
+            }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }   
+    </style>
+</head>
+<body>
+    <div class="page">
+        <h1 class="title">UPCOMING <span>EVENTS</span></h1>
+        <div class="month" id="month-label">&nbsp;</div>
+        <div class="event-count" id="event-count">&nbsp;</div>
+        <div class="controls">
+            <label for="month-select">Month:</label>
+            <select id="month-select"></select>
+            <label for="year-select">Year:</label>
+            <select id="year-select"></select>
+        </div>
+
+        <div class="list" id="events-list"></div>
+    </div>
+    <!-- SweetAlert2 for modals like update page -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function() {
+            const API_URL = 'http://localhost:3300/api/event_this_month';
+            const listEl = document.getElementById('events-list');
+            const monthEl = document.getElementById('month-label');
+            const countEl = document.getElementById('event-count');
+            const monthSelect = document.getElementById('month-select');
+            const yearSelect = document.getElementById('year-select');
+            let allEvents = [];
+
+            // Modal helpers (match update_page.html experience)
+            function notifySuccess(message){
+                if (window.Swal && Swal.fire) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: String(message||''),
+                        showConfirmButton: false,
+                        timer: 1400,
+                        timerProgressBar: true,
+                        position: 'center'
+                    });
+                } else { alert(String(message||'')); }
+            }
+            function notifyError(message){
+                if (window.Swal && Swal.fire) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed',
+                        text: String(message||''),
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#1d4ed8'
+                    });
+                } else { alert(String(message||'')); }
+            }
+            async function confirmAction(message){
+                if (window.Swal && Swal.fire) {
+                    const r = await Swal.fire({
+                        icon: 'warning',
+                        title: 'Are you sure?',
+                        text: String(message || ''),
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, continue',
+                        confirmButtonColor: '#dc2626',
+                        cancelButtonText: 'Cancel'
+                    });
+                    return !!r.isConfirmed;
+                }
+                return Promise.resolve(confirm(String(message || '')));
+            }
+
+            function formatMonthYear(dateObj) {
+                const month = dateObj.toLocaleString('en-US', { month: 'long' }).toUpperCase();
+                const year = dateObj.getFullYear();
+                return { label: month + ' ', year: String(year) };
+            }
+
+            function parseYmd(dateStr) {
+                // Expecting YYYY-MM-DD or similar; fallback to Date constructor
+                if (!dateStr) return null;
+                const m = String(dateStr).match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+                if (m) {
+                    const y = parseInt(m[1], 10);
+                    const mo = parseInt(m[2], 10) - 1;
+                    const d = parseInt(m[3], 10);
+                    return new Date(y, mo, d);
+                }
+                const dObj = new Date(dateStr);
+                return isNaN(dObj.getTime()) ? null : dObj;
+            }
+
+            function formatCardDate(dateObj) {
+                const monthShort = dateObj.toLocaleString('en-US', { month: 'short' });
+                const day = dateObj.getDate();
+                return `${monthShort} ${day}`;
+            }
+
+            function render(events) {
+                listEl.innerHTML = '';
+                if (!events || events.length === 0) {
+                    listEl.innerHTML = '<div class="empty">No accepted events for the selected month.</div>';
+                    return;
+                }
+                events.forEach(ev => {
+                    const dateObj = parseYmd(ev.Date);
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="date">
+                            <span class="pill">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                ${dateObj ? formatCardDate(dateObj) : (ev.Date || '')}
+                            </span>
+                        </div>
+                        <div class="type">
+                            <span class="pill">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                ${(ev.Event_type || '').toString().toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="details">
+                            <div class="primary">${ev.Couple_name || ''}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteEvent('${ev.Date}', '${ev.Couple_name}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3,6 5,6 21,6"></polyline>
+                                <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            Delete
+                        </button>
+                    `;
+                    listEl.appendChild(card);
+                });
+            }
+
+            function filterByMonth(events, monthIndex, year) {
+                return events.filter(ev => {
+                    const d = parseYmd(ev.Date);
+                    return d && d.getMonth() === monthIndex && d.getFullYear() === year;
+                });
+            }
+
+            function setMonthYearLabel(monthIndex, year) {
+                const temp = new Date(year, monthIndex, 1);
+                const { label } = formatMonthYear(temp);
+                monthEl.innerHTML = `${label}<span class="year">${year}</span>`;
+            }
+
+            function setSummary(monthIndex, year, count) {
+                const noun = count === 1 ? 'Event' : 'Events';
+                countEl.textContent = `${count} ${noun}`;
+            }
+
+            function populateSelectors(currentMonth, currentYear) {
+                const months = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleString('en-US', { month: 'long' }));
+                monthSelect.innerHTML = months.map((m, i) => `<option value="${i}" ${i===currentMonth?'selected':''}>${m}</option>`).join('');
+                const years = [currentYear - 1, currentYear, currentYear + 1, currentYear + 2];
+                yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y===currentYear?'selected':''}>${y}</option>`).join('');
+            }
+
+            function onSelectionChange() {
+                const m = parseInt(monthSelect.value, 10);
+                const y = parseInt(yearSelect.value, 10);
+                setMonthYearLabel(m, y);
+                const filtered = filterByMonth(allEvents, m, y);
+                setSummary(m, y, filtered.length);
+                render(filtered);
+            }
+
+            async function load() {
+                const now = new Date();
+                populateSelectors(now.getMonth(), now.getFullYear());
+                setMonthYearLabel(now.getMonth(), now.getFullYear());
+                countEl.textContent = 'Loading...';
+
+                try {
+                    const res = await fetch(API_URL);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const payload = await res.json();
+                    allEvents = payload.events || [];
+                    onSelectionChange();
+                } catch (e) {
+                    console.error('Failed to load events summary', e);
+                    countEl.textContent = 'Failed to load events';
+                    listEl.innerHTML = '';
+                }
+            }
+
+            monthSelect.addEventListener('change', onSelectionChange);
+            yearSelect.addEventListener('change', onSelectionChange);
+
+            // Listen for cross-tab refresh requests
+            window.addEventListener('storage', (e) => {
+                if (e && e.key === 'events:refresh') {
+                    load();
+                }
+            });
+
+            // Global delete function
+            window.deleteEvent = async function(date, coupleName) {
+                console.log('Delete function called with:', { date, coupleName });
+                
+                const proceed = await confirmAction(`Permanently delete the event for ${coupleName} on ${date}? This cannot be undone.`);
+                if (!proceed) return;
+
+                try {
+                    console.log('Sending DELETE request to:', API_URL);
+                    const response = await fetch(API_URL, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            Date: date,
+                            Couple_name: coupleName
+                        })
+                    });
+
+                    console.log('Response status:', response.status);
+                    console.log('Response ok:', response.ok);
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error response:', errorData);
+                        throw new Error(errorData.error || 'Failed to delete event');
+                    }
+
+                    const result = await response.json();
+                    console.log('Event deleted successfully:', result);
+                    
+                    // Refresh the events list
+                    load();
+                    
+                    // Show success message
+                    notifySuccess('Event deleted successfully');
+                    
+                } catch (error) {
+                    console.error('Error deleting event:', error);
+                    notifyError('Failed to delete event: ' + error.message);
+                }
+            };
+
+            load();
+        })();
+    </script>
+</body>
+</html>

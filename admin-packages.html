@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Packages</title>
+  <link rel="stylesheet" href="css/index.css" />
+  <style>
+    body { background: transparent; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .card { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+    .card-header { padding: 18px 20px; border-bottom: 1px solid rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:space-between; }
+    .card-title { margin: 0; font-weight: 800; color: #0f172a; font-size: 20px; letter-spacing: .2px; text-shadow: none; }
+    .card-body { padding: 20px; }
+    .package-body-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 720px) { .package-body-grid { grid-template-columns: 1fr; } }
+    .side-card { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; box-shadow: 0 10px 24px rgba(0,0,0,0.06); padding: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .field { display: flex; flex-direction: column; }
+    .field label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .field input, .field textarea { padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; background: #f9fafb; font-size: 14px; color: #111827; }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .actions { margin-top: 18px; display:flex; gap: 10px; }
+    .btn { padding: 12px 16px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; }
+    .btn.primary { background: #4f46e5; color: #fff; }
+    .btn.secondary { background: #e5e7eb; color: #111827; }
+    .help { font-size: 12px; color: #64748b; margin-top: 6px; }
+    .status { font-size: 12px; margin-top: 6px; }
+    .status.error { color: #991b1b; }
+    .status.success { color: #155e75; }
+    .alert { display:none; margin-bottom:12px; padding: 12px 14px; border-radius: 10px; font-size: 14px; }
+    .alert.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .alert.success { background: #ecfeff; color: #155e75; border: 1px solid #a5f3fc; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    /* spinner removed */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .badge { display: none; padding: 4px 8px; border-radius: 9999px; font-size: 12px; font-weight: 800; width: fit-content; margin-top: 6px; }
+    .badge.error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    /* overlay spinner removed */
+  </style>
+  <!-- SweetAlert2 for success modal (same as update pages) -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // Modal helpers to match update pages
+    function notifySuccess(message){
+      if (window.Swal && Swal.fire) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: String(message||''),
+          showConfirmButton: false,
+          timer: 1400,
+          timerProgressBar: true,
+          position: 'center'
+        });
+      } else { alert(String(message||'')); }
+    }
+    function notifyError(message){
+      if (window.Swal && Swal.fire) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: String(message||''),
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#1d4ed8'
+        });
+      } else { alert(String(message||'')); }
+    }
+    async function confirmAction(message){
+      if (window.Swal && Swal.fire) {
+        const r = await Swal.fire({
+          icon: 'warning',
+          title: 'Are you sure?',
+          text: String(message || ''),
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete',
+          confirmButtonColor: '#dc2626',
+          cancelButtonText: 'Cancel'
+        });
+        return !!r.isConfirmed;
+      }
+      return Promise.resolve(confirm(String(message || '')));
+    }
+    function getToken() {
+      try { return localStorage.getItem('adminToken') || ''; } catch (_) { return ''; }
+    }
+
+    async function submitPackageForm(e) {
+      e.preventDefault();
+      const el = (id) => document.getElementById(id);
+      const formEl = e.target;
+      const submitBtn = el('createBtn');
+
+      const payload = {
+        name: el('pkg-name').value.trim(),
+        description: el('pkg-description').value.trim() || null,
+        price: Number(el('pkg-price').value),
+        pax_count: el('pkg-pax').value ? Number(el('pkg-pax').value) : null,
+        venues: el('pkg-venues').value.trim() ? el('pkg-venues').value.split(',').map(s => s.trim()).filter(Boolean) : null,
+        inclusions: el('pkg-inclusions').value.trim() ? el('pkg-inclusions').value.split(',').map(s => s.trim()).filter(Boolean) : null,
+        image_url: el('pkg-image').value.trim() || null,
+        is_active: el('pkg-active').checked
+      };
+
+      const errorBox = el('errorBox');
+      const successBox = el('successBox');
+      errorBox.style.display = 'none';
+      successBox.style.display = 'none';
+
+      const token = getToken();
+      if (!token) {
+        errorBox.textContent = 'Not authenticated. Please log in as admin and try again.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      if (!payload.name || !payload.price || isNaN(payload.price) || payload.price <= 0) {
+        errorBox.textContent = 'Please provide a valid name and a positive price.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      try {
+        // lock UI
+        // use only the centered overlay spinner
+        const minSpinnerMs = 0;
+        const spinnerStartAt = Date.now();
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Creating...'; }
+        Array.from(formEl.querySelectorAll('input, textarea, button')).forEach((node) => { node.disabled = true; });
+        const res = await fetch('http://localhost:5000/api/packages', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        let data;
+        const text = await res.text();
+        try { data = text ? JSON.parse(text) : {}; } catch (_) { data = { raw: text }; }
+        if (!res.ok) {
+          const msg = (data && (data.message || data.error)) || (typeof data === 'string' ? data : (data && data.raw)) || 'Failed to create package';
+          throw new Error(`HTTP ${res.status}: ${msg}`);
+        }
+
+        successBox.textContent = 'Package created successfully';
+        successBox.style.display = 'block';
+        // Show success modal (match update pages UX)
+        notifySuccess('Package created successfully');
+        (e.target).reset();
+      } catch (err) {
+        errorBox.textContent = err.message || 'Failed to create package';
+        errorBox.style.display = 'block';
+        // Optional: show error modal for consistency
+        notifyError(err.message || 'Failed to create package');
+      } finally {
+        // unlock UI
+        // ensure spinner is visible for at least minSpinnerMs
+        try {
+          const now = Date.now();
+          const elapsed = (typeof spinnerStartAt === 'number') ? (now - spinnerStartAt) : 0;
+          const remaining = (typeof minSpinnerMs === 'number') ? Math.max(0, minSpinnerMs - elapsed) : 0;
+          if (remaining > 0) { await new Promise((r) => setTimeout(r, remaining)); }
+        } catch (_) { /* ignore timing errors */ }
+        
+        Array.from(formEl.querySelectorAll('input, textarea, button')).forEach((node) => { node.disabled = false; });
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Create Package'; }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('packageForm');
+      form.addEventListener('submit', submitPackageForm);
+
+      // Image upload wiring
+      const fileInput = document.getElementById('pkg-image-file');
+      const urlInput = document.getElementById('pkg-image');
+      const uploadSpin = document.getElementById('pkg-image-upload-spinner');
+      const statusEl = document.getElementById('pkg-image-status');
+      if (fileInput) {
+        fileInput.addEventListener('change', async function() {
+          if (!fileInput.files || !fileInput.files[0]) return;
+          const token = getToken();
+          if (!token) {
+            if (statusEl) { statusEl.className = 'status error'; statusEl.textContent = 'Not authenticated. Please log in as admin.'; }
+            return;
+          }
+          const file = fileInput.files[0];
+          if (statusEl) { statusEl.className = 'status'; statusEl.textContent = ''; }
+          if (uploadSpin) uploadSpin.style.display = 'inline-block';
+          try {
+            const fd = new FormData();
+            fd.append('image', file);
+            const res = await fetch('http://localhost:5000/api/page-overrides/upload', {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + token },
+              body: fd
+            });
+            const text = await res.text();
+            let data; try { data = text ? JSON.parse(text) : {}; } catch (_) { data = { raw: text }; }
+            if (!res.ok || !data || !data.url) {
+              const msg = (data && (data.message || data.error)) || 'Upload failed';
+              throw new Error(msg);
+            }
+            if (urlInput) urlInput.value = data.url;
+            if (statusEl) { statusEl.className = 'status success'; statusEl.textContent = 'Uploaded successfully'; }
+          } catch (err) {
+            if (statusEl) { statusEl.className = 'status error'; statusEl.textContent = err.message || 'Upload failed'; }
+          } finally {
+            if (uploadSpin) uploadSpin.style.display = 'none';
+            if (fileInput) fileInput.value = '';
+          }
+        });
+      }
+
+      // Delete by price wiring
+      const deleteBtn = document.getElementById('deleteByPriceBtn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', async function() {
+          const priceInput = document.getElementById('delete-price');
+          const priceBadge = document.getElementById('delete-price-badge');
+          const errorBox = document.getElementById('deleteErrorBox');
+          const successBox = document.getElementById('deleteSuccessBox');
+          errorBox.style.display = 'none';
+          successBox.style.display = 'none';
+          if (priceBadge) priceBadge.style.display = 'none';
+
+          const token = getToken();
+          if (!token) {
+            errorBox.textContent = 'Not authenticated. Please log in as admin and try again.';
+            errorBox.style.display = 'block';
+            return;
+          }
+
+          const rawVal = (priceInput && typeof priceInput.value !== 'undefined') ? String(priceInput.value).trim() : undefined;
+          if (rawVal === undefined || rawVal === '') {
+            if (priceBadge) {
+              priceBadge.textContent = 'Price undefined';
+              priceBadge.style.display = 'inline-block';
+            }
+            errorBox.textContent = 'Price undefined';
+            errorBox.style.display = 'block';
+            notifyError('Price undefined');
+            return;
+          }
+          const priceVal = Number(rawVal);
+          if (!isFinite(priceVal) || priceVal <= 0) {
+            errorBox.textContent = 'Please enter a valid positive price.';
+            errorBox.style.display = 'block';
+            notifyError('Please enter a valid positive price.');
+            return;
+          }
+
+          try {
+            const proceed = await confirmAction(`Delete all packages with price ${priceVal}?`);
+            if (!proceed) return;
+            const url = 'http://localhost:5000/api/packages/by-price?price=' + encodeURIComponent(priceVal);
+            const res = await fetch(url, {
+              method: 'DELETE',
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+            let data; const text = await res.text();
+            try { data = text ? JSON.parse(text) : {}; } catch (_) { data = { raw: text }; }
+            if (!res.ok) {
+              const msg = (data && (data.message || data.error)) || (typeof data === 'string' ? data : (data && data.raw)) || 'Failed to delete packages';
+              throw new Error(`HTTP ${res.status}: ${msg}`);
+            }
+            const count = (data && data.affectedRows) || 0;
+            if (count > 0) {
+              successBox.textContent = `Deleted ${count} package(s) at price ${priceVal}.`;
+              successBox.style.display = 'block';
+              notifySuccess(`Deleted ${count} package(s) at price ${priceVal}.`);
+            } else {
+              errorBox.textContent = `No packages found at price ${priceVal}.`;
+              errorBox.style.display = 'block';
+              notifyError(`No packages found at price ${priceVal}.`);
+            }
+          } catch (err) {
+            errorBox.textContent = err.message || 'Failed to delete packages';
+            errorBox.style.display = 'block';
+            notifyError(err.message || 'Failed to delete packages');
+          }
+        });
+
+        // live badge toggle on input
+        const priceInput = document.getElementById('delete-price');
+        const priceBadge = document.getElementById('delete-price-badge');
+        if (priceInput) {
+          priceInput.addEventListener('input', function() {
+            const rawVal = (typeof priceInput.value !== 'undefined') ? String(priceInput.value).trim() : undefined;
+            const isUndefinedOrEmpty = (rawVal === undefined || rawVal === '');
+            if (priceBadge) {
+              priceBadge.textContent = isUndefinedOrEmpty ? 'Price undefined' : '';
+              priceBadge.style.display = isUndefinedOrEmpty ? 'inline-block' : 'none';
+            }
+          });
+        }
+      }
+    });
+  </script>
+  </head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h1 class="card-title"><span style="display:inline-flex;vertical-align:middle;margin-right:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>Add New Package</h1>
+      </div>
+      <div class="card-body">
+        <div class="package-body-grid">
+          <div>
+            <div id="errorBox" class="alert error"></div>
+            <div id="successBox" class="alert success"></div>
+            <form id="packageForm">
+              <div class="grid">
+                <div class="field">
+                  <label for="pkg-name">Name *</label>
+                  <input id="pkg-name" type="text" placeholder="Package" required style="max-width: 320px;" />
+                </div>
+                <div class="field">
+                  <label>Choose Photo</label>
+                  <div class="help">Use an uploaded image path if available.</div>
+                  <div class="actions" style="margin-top:0;gap:8px;align-items:center;">
+                    <input id="pkg-image-file" type="file" accept="image/*" style="padding:8px 0;" />
+                  </div>
+                  <div id="pkg-image-status" class="status"></div>
+                </div>
+                <div class="field">
+                  <label for="pkg-price">Price (PHP) *</label>
+                  <input id="pkg-price" type="number" step="0.01" min="0" placeholder="e.g., 120000" required style="max-width: 220px;" />
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="pkg-pax">Pax Count</label>
+                  <input id="pkg-pax" type="number" step="1" min="1" placeholder="e.g., 150" style="max-width: 220px;" />
+                </div>
+                <div class="field">
+                  <label for="pkg-image">Image URL</label>
+                  <input id="pkg-image" type="text" placeholder="/uploads/page-overrides/images/xxx.jpg" />
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="pkg-venues">Venues (comma-separated)</label>
+                  <input id="pkg-venues" type="text" placeholder="Waterfront Hotel, Bai Hotel" />
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="pkg-inclusions">Inclusions (comma-separated)</label>
+                  <textarea id="pkg-inclusions" placeholder="Catering, Photo/Video, MC"></textarea>
+                </div>
+                <div class="field" style="grid-column: 1 / -1;">
+                  <label for="pkg-description">Description</label>
+                  <textarea id="pkg-description" placeholder="Short description..."></textarea>
+                </div>
+                <div class="field">
+                  <label for="pkg-active">Active</label>
+                  <div><input id="pkg-active" type="checkbox" checked /> <span class="help">Visible to clients when active.</span></div>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="btn secondary" type="reset">Clear</button>
+                <button id="createBtn" class="btn primary" type="submit">Create Package</button>
+              </div>
+            </form>
+          </div>
+          <div class="side-card">
+            <div class="card-header" style="padding:0 0 10px 0; border-bottom:1px solid rgba(0,0,0,0.06); margin-bottom:12px;">
+              <h1 class="card-title" style="font-size:18px;">Delete Packages by Price</h1>
+            </div>
+            <div id="deleteErrorBox" class="alert error"></div>
+            <div id="deleteSuccessBox" class="alert success"></div>
+            <div class="grid">
+              <div class="field" style="grid-column: 1 / -1;">
+                <label for="delete-price">Price (PHP) *</label>
+                <input id="delete-price" type="number" step="0.01" min="0" placeholder="e.g., 120000" />
+                <div id="delete-price-badge" class="badge error">Price undefined</div>
+                <div class="help">Deletes all packages with this exact price.</div>
+              </div>
+            </div>
+            <div class="actions">
+              <button id="deleteByPriceBtn" class="btn" style="background:#dc2626;color:#fff;">Delete by Price</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  </body>
+  </html>
+
+

@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Cwep - Client Testimonials</title>
+    <link rel="stylesheet" href="css/index.css?v=1.0.0">
+</head>
+<body>
+     <!-- Top Information Bar -->
+     <div class="info-bar">
+        <div class="logo">
+            <div class="hex-logo">CWEP</div>
+        </div>
+        
+        <div class="contact-info">
+            <div class="info-item">
+                <div class="icon location-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 21c-4.418 0-8-5.373-8-10a8 8 0 1 1 16 0c0 4.627-3.582 10-8 10z"/>
+                        <circle cx="12" cy="11" r="3"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">KASADYA POBLACION CORDOVA</div>
+                    <div class="sub">CEBU</div>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="icon clock-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">OFFICE HOURS</div>
+                    <div class="sub">8:00AM-9:00PM</div>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="icon phone-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 3.09 5.18 2 2 0 0 1 5 3h3a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.05a2 2 0 0 1-.45 2.11l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.98.35 2 .59 3.05.72A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </div>
+                <div class="text">
+                    <div class="main">09876356425</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bottom Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-menu">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="about.html" class="nav-item">About Us</a>
+            <a href="services.html" class="nav-item">Services</a>
+            <a href="packages.html" class="nav-item">Packages</a>
+            <a href="contact.html" class="nav-item">Contact</a>
+            <a href="testimonials.html" class="nav-item active">Testimonials</a>
+            <a href="admin.html" class="nav-item">Log in as admin</a>
+          
+        </div>
+        
+        <a href="book.html" class="book-button">Book</a>
+    </div>
+
+    
+
+
+    <!-- Dynamic Testimonials from Messages -->
+    <div class="dynamic-testimonials">
+            <h2 class="section-title">Featured<span class="script-text">testimonials</span></h2>
+            <p class="section-subtitle">Latest testimonials from our happy couples</p>
+            <div class="carousel-wrapper">
+                <button class="carousel-nav prev" aria-label="Previous">‹</button>
+                <div class="dynamic-testimonials-container" id="dynamicTestimonials">
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        Loading testimonials...
+                    </div>
+                </div>
+                <button class="carousel-nav next" aria-label="Next">›</button>
+            </div>
+        
+            <div class="feedback-cta">
+                <a href="feedback.html" class="feedback-btn" aria-label="Give Feedback">Feedback</a>
+            </div>
+    </div>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            overflow-x: hidden;
+        }
+
+
+
+        /* Testimonials Hero Section */
+        .testimonials-hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('indeximages/wed.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        .script-text {
+            font-style: italic;
+            color: #d4af37;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: bold;
+            color:white;
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color:white;
+        }
+
+        
+
+        /* Dynamic Testimonials Section */
+        .dynamic-testimonials {
+            padding: 80px 0;
+            background: linear-gradient(rgba(30, 58, 138, 0.8), rgba(30, 58, 138, 0.8)), url('indeximages/wed.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        /* Feedback CTA */
+        .feedback-cta {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .feedback-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #d4af37 0%, #b89728 100%);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: .3px;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.25);
+            border: 2px solid transparent;
+            transition: all .2s ease;
+        }
+        .feedback-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(212,175,55,.35);
+            background: linear-gradient(135deg, #e3c75b 0%, #c9a53e 100%);
+            border-color: rgba(212, 175, 55, 0.6);
+            filter: saturate(1.05);
+        }
+        .feedback-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(212,175,55,.35), 0 10px 25px rgba(212,175,55,.25);
+        }
+        .feedback-btn:active { transform: translateY(0); }
+
+        /* Center heading and subtitle within dynamic testimonials */
+        .dynamic-testimonials .section-title,
+        .dynamic-testimonials .section-subtitle {
+            text-align: center;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 60px;
+        }
+
+        .carousel-nav {
+            background: #ec4899;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            position: absolute;
+            z-index: 10;
+        }
+
+        .carousel-nav.prev {
+            left: 0;
+        }
+
+        .carousel-nav.next {
+            right: 0;
+        }
+
+        .carousel-nav:hover { 
+            background: #db2777; 
+            transform: scale(1.1);
+        }
+        .carousel-nav:active { transform: scale(0.95); }
+
+        .dynamic-testimonials-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .dynamic-testimonial-card {
+            background: #fce7f3;
+            padding: 50px 40px 40px 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            border: none;
+            min-width: 450px;
+            flex: 0 0 450px;
+            position: relative;
+            color: #1f2937;
+            z-index: 5;
+        }
+
+        .dynamic-testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .dynamic-card-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dynamic-card-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid white;
+            flex-shrink: 0;
+            margin-bottom: -60px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 6;
+        }
+
+        .dynamic-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dynamic-card-info h3 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 15px;
+            text-align: center;
+            margin-top: 70px;
+        }
+
+        .dynamic-wedding-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .dynamic-wedding-type {
+            font-size: 14px;
+            color: #ec4899;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .dynamic-wedding-date {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .star {
+            color: #8b5cf6;
+            font-size: 20px;
+        }
+
+        .testimonial-star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin: 10px 0;
+        }
+
+        .testimonial-star {
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        .dynamic-testimonial-text {
+            color: #1f2937;
+            line-height: 1.7;
+            font-style: normal;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 16px;
+            padding: 0 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Side Preview Images */
+        .side-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+        .side-preview:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        .side-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .side-preview.far {
+            width: 60px;
+            height: 60px;
+            opacity: 0.4;
+        }
+
+        .side-preview.far:hover {
+            opacity: 0.6;
+        }
+
+
+
+        /* Call to Action Section */
+        .cta-section {
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-button {
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button.primary {
+            background-color: #d4af37;
+            color: white;
+        }
+
+        .cta-button.primary:hover {
+            background-color: #b89728;
+            transform: scale(1.05);
+        }
+
+        .cta-button.secondary {
+            background-color: transparent;
+            color: #1e3a8a;
+            border: 2px solid #1e3a8a;
+        }
+
+        .cta-button.secondary:hover {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        /* Footer Contact Info */
+        .footer-contact {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 60px 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #d4af37;
+        }
+
+        .footer-section p {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        /* Mobile First Responsive Design */
+        
+        /* Extra Small Phones (320px and below) */
+        @media (max-width: 320px) {
+            .info-bar {
+                padding: 10px 0;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            
+            .contact-info {
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+            
+            .info-item .text {
+                font-size: 12px;
+            }
+            
+            .section-title { 
+                font-size: 20px; 
+                margin-bottom: 10px;
+            }
+            
+            .section-subtitle { 
+                font-size: 12px; 
+            }
+            
+            .dynamic-testimonials {
+                padding: 40px 0;
+            }
+            
+            .carousel-wrapper { 
+                gap: 5px; 
+                padding: 0 20px;
+            }
+            
+            .carousel-nav { 
+                width: 30px; 
+                height: 30px; 
+                font-size: 16px; 
+            }
+            
+            .dynamic-testimonial-card { 
+                min-width: 90vw; 
+                flex: 0 0 90vw; 
+                padding: 30px 15px 15px 15px; 
+            }
+            
+            .dynamic-card-image { 
+                width: 80px; 
+                height: 80px; 
+                margin-bottom: -40px;
+            }
+            
+            .dynamic-card-info h3 {
+                font-size: 18px;
+                margin-top: 50px;
+            }
+            
+            .dynamic-testimonial-text {
+                font-size: 14px;
+                padding: 0 5px;
+            }
+            
+            .side-preview {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .side-preview.far {
+                width: 30px;
+                height: 30px;
+            }
+        }
+        
+        /* Small Phones (321px - 375px) */
+        @media (min-width: 321px) and (max-width: 375px) {
+            .info-bar {
+                padding: 12px 0;
+                gap: 30px;
+            }
+            
+            .contact-info {
+                gap: 30px;
+            }
+            
+            .section-title { 
+                font-size: 22px; 
+            }
+            
+            .section-subtitle { 
+                font-size: 13px; 
+            }
+            
+            .carousel-wrapper { 
+                gap: 8px; 
+                padding: 0 25px;
+            }
+            
+            .carousel-nav { 
+                width: 35px; 
+                height: 35px; 
+                font-size: 18px; 
+            }
+            
+            .dynamic-testimonial-card { 
+                min-width: 85vw; 
+                flex: 0 0 85vw; 
+                padding: 35px 20px 20px 20px; 
+            }
+            
+            .dynamic-card-image { 
+                width: 90px; 
+                height: 90px; 
+                margin-bottom: -45px;
+            }
+            
+            .side-preview {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .side-preview.far {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        
+        /* Medium Phones (376px - 414px) */
+        @media (min-width: 376px) and (max-width: 414px) {
+            .info-bar {
+                padding: 15px 0;
+                gap: 40px;
+            }
+            
+            .contact-info {
+                gap: 40px;
+            }
+            
+            .section-title { 
+                font-size: 24px; 
+            }
+            
+            .section-subtitle { 
+                font-size: 14px; 
+            }
+            
+            .carousel-wrapper { 
+                gap: 10px; 
+                padding: 0 30px;
+            }
+            
+            .carousel-nav { 
+                width: 40px; 
+                height: 40px; 
+                font-size: 20px; 
+            }
+            
+            .dynamic-testimonial-card { 
+                min-width: 80vw; 
+                flex: 0 0 80vw; 
+                padding: 40px 25px 25px 25px; 
+            }
+            
+            .dynamic-card-image { 
+                width: 100px; 
+                height: 100px; 
+                margin-bottom: -50px;
+            }
+            
+            .side-preview {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .side-preview.far {
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        /* Large Phones (415px - 480px) */
+        @media (min-width: 415px) and (max-width: 480px) {
+            .info-bar {
+                padding: 15px 0;
+                gap: 50px;
+            }
+            
+            .contact-info {
+                gap: 50px;
+            }
+            
+            .section-title { 
+                font-size: 26px; 
+            }
+            
+            .section-subtitle { 
+                font-size: 15px; 
+            }
+            
+            .carousel-wrapper { 
+                gap: 12px; 
+                padding: 0 35px;
+            }
+            
+            .carousel-nav { 
+                width: 42px; 
+                height: 42px; 
+                font-size: 22px; 
+            }
+            
+            .dynamic-testimonial-card { 
+                min-width: 75vw; 
+                flex: 0 0 75vw; 
+                padding: 45px 30px 30px 30px; 
+            }
+            
+            .dynamic-card-image { 
+                width: 110px; 
+                height: 110px; 
+                margin-bottom: -55px;
+            }
+            
+            .side-preview {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .side-preview.far {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        /* Tablets and Small Laptops (481px - 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .info-bar {
+                padding: 15px 0;
+                gap: 60px;
+            }
+            
+            .contact-info {
+                gap: 60px;
+            }
+            
+            .section-title { 
+                font-size: 28px; 
+            }
+            
+            .section-subtitle { 
+                font-size: 16px; 
+            }
+            
+            .carousel-wrapper { 
+                gap: 15px; 
+                padding: 0 50px;
+            }
+            
+            .carousel-nav { 
+                width: 45px; 
+                height: 45px; 
+                font-size: 24px; 
+            }
+            
+            .dynamic-testimonial-card { 
+                min-width: 70vw; 
+                flex: 0 0 70vw; 
+                padding: 50px 35px 35px 35px; 
+            }
+            
+            .dynamic-card-image { 
+                width: 120px; 
+                height: 120px; 
+                margin-bottom: -60px;
+            }
+            
+            .side-preview {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .side-preview.far {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        /* Landscape Orientation for Phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .info-bar {
+                padding: 8px 0;
+                gap: 20px;
+            }
+            
+            .dynamic-testimonials {
+                padding: 30px 0;
+            }
+            
+            .section-title { 
+                font-size: 20px; 
+                margin-bottom: 8px;
+            }
+            
+            .section-subtitle { 
+                font-size: 12px; 
+                margin-bottom: 20px;
+            }
+            
+            .carousel-wrapper { 
+                gap: 8px; 
+                padding: 0 25px;
+            }
+            
+            .dynamic-testimonial-card { 
+                min-width: 85vw; 
+                flex: 0 0 85vw; 
+                padding: 25px 20px 20px 20px; 
+            }
+            
+            .dynamic-card-image { 
+                width: 80px; 
+                height: 80px; 
+                margin-bottom: -40px;
+            }
+            
+            .dynamic-card-info h3 {
+                font-size: 18px;
+                margin-top: 50px;
+            }
+            
+            .dynamic-testimonial-text {
+                font-size: 14px;
+            }
+        }
+        
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .dynamic-testimonial-card {
+                border-width: 0.5px;
+            }
+        }
+        
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .carousel-nav {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .side-preview {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .book-button {
+                min-height: 44px;
+                padding: 12px 25px;
+            }
+        }
+        
+        /* Smooth scrolling for mobile */
+        html {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        
+        /* Better touch targets for mobile */
+        .carousel-nav,
+        .side-preview,
+        .book-button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+    </style>
+
+    <script>
+
+        // Load dynamic testimonials from API
+        async function loadDynamicTestimonials() {
+            const container = document.getElementById('dynamicTestimonials');
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/testimonials');
+                const data = await response.json();
+                
+                if (data.success && data.testimonials.length > 0) {
+                    try { localStorage.setItem('cache:testimonials', JSON.stringify(data)); } catch (_) {}
+                    // Prefetch and cache photos as data URLs for offline use
+                    try {
+                        await Promise.all(
+                            data.testimonials
+                                .filter(t => t.photo_path)
+                                .map(async (t) => {
+                                    const url = `http://localhost:5000${t.photo_path}`;
+                                    try {
+                                        const resp = await fetch(url, { mode: 'cors' });
+                                        if (!resp.ok) return;
+                                        const blob = await resp.blob();
+                                        const reader = new FileReader();
+                                        const dataUrl = await new Promise((resolve, reject) => {
+                                            reader.onloadend = () => resolve(reader.result);
+                                            reader.onerror = reject;
+                                            reader.readAsDataURL(blob);
+                                        });
+                                        try { localStorage.setItem(`cache:image:${t.photo_path}`, String(dataUrl)); } catch (_) {}
+                                    } catch (_) { /* ignore single image failures */ }
+                                })
+                        );
+                    } catch (_) {}
+                    // Create carousel with side previews
+                    window.testimonials = data.testimonials;
+                    window.currentIndex = 0;
+                    
+                    function renderCarousel() {
+                        const current = window.testimonials[window.currentIndex];
+                        const leftPreviews = [];
+                        const rightPreviews = [];
+                        
+                        // Create left side previews
+                        for (let i = 1; i <= 2; i++) {
+                            const index = (window.currentIndex - i + window.testimonials.length) % window.testimonials.length;
+                            const testimonial = window.testimonials[index];
+                            leftPreviews.push(`
+                                <div class="side-preview ${i === 2 ? 'far' : ''}" onclick="setCurrentIndex(${index})">
+                                    ${testimonial.photo_path ? 
+                                        `<img src="http://localhost:5000${testimonial.photo_path}" alt="${testimonial.name}">` :
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ec4899, #db2777); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${testimonial.name.charAt(0).toUpperCase()}</div>`
+                                    }
+                                </div>
+                            `);
+                        }
+                        
+                        // Create right side previews
+                        for (let i = 1; i <= 2; i++) {
+                            const index = (window.currentIndex + i) % window.testimonials.length;
+                            const testimonial = window.testimonials[index];
+                            rightPreviews.push(`
+                                <div class="side-preview ${i === 2 ? 'far' : ''}" onclick="setCurrentIndex(${index})">
+                                    ${testimonial.photo_path ? 
+                                        `<img src="http://localhost:5000${testimonial.photo_path}" alt="${testimonial.name}">` :
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ec4899, #db2777); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">${testimonial.name.charAt(0).toUpperCase()}</div>`
+                                    }
+                                </div>
+                            `);
+                        }
+                        
+                        container.innerHTML = `
+                            ${leftPreviews.reverse().join('')}
+                            <div class="dynamic-testimonial-card">
+                                <div class="dynamic-card-header">
+                                    <div class="dynamic-card-image">
+                                        ${current.photo_path ? 
+                                            `<img src="http://localhost:5000${current.photo_path}" alt="${current.name}">` :
+                                            `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ec4899, #db2777); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 28px;">${current.name.charAt(0).toUpperCase()}</div>`
+                                        }
+                                    </div>
+                                    <div class="dynamic-card-info">
+                                        <h3>${current.name}</h3>
+                                    </div>
+                                </div>
+                                <p class="dynamic-testimonial-text">${current.message}</p>
+                                <div class="testimonial-star-rating">
+                                    ${(() => {
+                                        const r = Math.max(0, Math.min(5, Number(current.rating || 0)));
+                                        const filled = Array.from({length: r}).map(() => '<span class="testimonial-star">★</span>').join('');
+                                        const empty = Array.from({length: 5 - r}).map(() => '<span class="testimonial-star" style="opacity:0.25;">★</span>').join('');
+                                        return filled + empty;
+                                    })()}
+                                </div>
+                            </div>
+                            ${rightPreviews.join('')}
+                        `;
+                    }
+                    
+                    // Make setCurrentIndex globally available
+                    window.setCurrentIndex = function(index) {
+                        window.currentIndex = index;
+                        renderCarousel();
+                    };
+                    
+                    renderCarousel();
+                } else {
+                    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No testimonials available yet.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading testimonials:', error);
+                // Fallback to cached content if available
+                try {
+                    const cached = localStorage.getItem('cache:testimonials');
+                    if (cached) {
+                        const data = JSON.parse(cached);
+                        if (data && Array.isArray(data.testimonials) && data.testimonials.length > 0) {
+                            container.innerHTML = data.testimonials.map(testimonial => `
+                        <div class="dynamic-testimonial-card">
+                            <div class="dynamic-card-header">
+                                <div class="dynamic-card-image">
+                                    ${testimonial.photo_path ? 
+                                        (() => { const cachedImg = localStorage.getItem(`cache:image:${testimonial.photo_path}`); return cachedImg ? `<img src="${cachedImg}" alt="${testimonial.name}">` : `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #d4af37, #b89728); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px;">${testimonial.name.charAt(0).toUpperCase()}</div>`; })() :
+                                        `<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #d4af37, #b89728); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px;">${testimonial.name.charAt(0).toUpperCase()}</div>`
+                                    }
+                                </div>
+                                <div class="dynamic-card-info">
+                                    <h3>${testimonial.name}</h3>
+                                    
+                                    <div class="dynamic-wedding-details">
+                                        <span class="dynamic-wedding-type">Wedding Message</span>
+                                        <span class="dynamic-wedding-date">${new Date(testimonial.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="dynamic-testimonial-text">"${testimonial.message}"</p>
+                            <div class="testimonial-star-rating">
+                                ${(() => {
+                                    const r = Math.max(0, Math.min(5, Number(testimonial.rating || 0)));
+                                    const filled = Array.from({length: r}).map(() => '<span class="testimonial-star">★</span>').join('');
+                                    const empty = Array.from({length: 5 - r}).map(() => '<span class="testimonial-star" style="opacity:0.25;">★</span>').join('');
+                                    return filled + empty;
+                                })()}
+                            </div>
+                        </div>
+                    `).join('');
+                            return;
+                        }
+                    }
+                } catch (_) {}
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Offline. Showing no testimonials. Try again later.</div>';
+            }
+        }
+
+        // Add smooth scroll animation to testimonials
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load dynamic testimonials
+            loadDynamicTestimonials();
+            
+            const testimonials = document.querySelectorAll('.dynamic-testimonial-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+
+            // Set up observer for dynamic testimonials after they're loaded
+            setTimeout(() => {
+                document.querySelectorAll('.dynamic-testimonial-card').forEach(testimonial => {
+                    testimonial.style.opacity = '0';
+                    testimonial.style.transform = 'translateY(30px)';
+                    testimonial.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    observer.observe(testimonial);
+                });
+
+                // Carousel controls
+                const container = document.getElementById('dynamicTestimonials');
+                const prevBtn = document.querySelector('.carousel-nav.prev');
+                const nextBtn = document.querySelector('.carousel-nav.next');
+
+                function navigateCarousel(direction) {
+                    if (window.testimonials && window.testimonials.length > 0) {
+                        if (direction === -1) {
+                            window.currentIndex = (window.currentIndex - 1 + window.testimonials.length) % window.testimonials.length;
+                        } else {
+                            window.currentIndex = (window.currentIndex + 1) % window.testimonials.length;
+                        }
+                        window.setCurrentIndex(window.currentIndex);
+                    }
+                }
+
+                if (prevBtn) prevBtn.addEventListener('click', () => navigateCarousel(-1));
+                if (nextBtn) nextBtn.addEventListener('click', () => navigateCarousel(1));
+            }, 150);
+        });
+    </script>
+    <script>
+        (function(){
+            try {
+                function api(url){ return (location && location.protocol === 'file:' ? 'http://localhost:5000' : '') + url; }
+                function resolveUrl(u){
+                    if (!u) return '';
+                    const s = String(u).trim();
+                    if (!s) return '';
+                    if (s.startsWith('/uploads/')) return api(s);
+                    if (/^https?:\/\//i.test(s) || /^data:/i.test(s) || /^file:\/\//i.test(s)) return s;
+                    return s; // relative path
+                }
+
+                function apply(){
+                    const raw = localStorage.getItem('pageOverrides:testimonials');
+                    const data = raw ? JSON.parse(raw) : null;
+                    if (!data) return;
+                    const hero = document.querySelector('.dynamic-testimonials');
+                    if (hero && data.bg) {
+                        const url = resolveUrl(data.bg);
+                        hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('${url}')`;
+                    }
+                    if (data.text1) {
+                        const el = document.querySelector('.dynamic-testimonials .section-title');
+                        if (el) el.textContent = data.text1;
+                    }
+                    if (data.text2) {
+                        const el = document.querySelector('.dynamic-testimonials .section-subtitle');
+                        if (el) el.textContent = data.text2;
+                    }
+                }
+                apply();
+                window.addEventListener('storage', function(e){ if (e && e.key === 'pageOverrides:testimonials') apply(); });
+            } catch (_) {}
+        })();
+    </script>
+    <script>
+        (function(){
+            try {
+                function api(url){ return (location && location.protocol === 'file:' ? 'http://localhost:5000' : '') + url; }
+                function resolveLogoUrl(u){
+                    if (!u) return '';
+                    const s = String(u).trim();
+                    if (!s) return '';
+                    if (s.startsWith('/uploads/')) return api(s);
+                    if (/^https?:\/\//i.test(s) || /^data:/i.test(s) || /^file:\/\//i.test(s)) return s;
+                    return s;
+                }
+                let applyTimer = null;
+                function preloadImage(url) {
+                    return new Promise((resolve, reject) => {
+                        if (!url || url.startsWith('data:')) {
+                            resolve(url);
+                            return;
+                        }
+                        const img = new Image();
+                        img.onload = () => resolve(url);
+                        img.onerror = () => resolve(url); // Still apply even if load fails
+                        img.src = url;
+                    });
+                }
+                async function applyHexLogo(){
+                    let backend = null;
+                    let local = null;
+                    try {
+                        const r = await fetch(api('/api/page-overrides/global'));
+                        if (r.ok) {
+                            const j = await r.json();
+                            backend = (j && j.data) || null;
+                        }
+                    } catch (_) {}
+                    try {
+                        const raw = localStorage.getItem('pageOverrides:global');
+                        if (raw) local = JSON.parse(raw);
+                    } catch (_) {}
+                    const data = Object.assign({}, backend || {}, local || {});
+                    const text = (data && data.hexLogoText) || '';
+                    const bg = (data && data.hexLogoBg) || '';
+                    if (!text && !bg) return;
+                    const els = document.querySelectorAll('.hex-logo');
+                    
+                    // Preload image if exists
+                    let logoUrl = '';
+                    if (bg) {
+                        logoUrl = resolveLogoUrl(bg);
+                        if (logoUrl && !logoUrl.startsWith('data:')) {
+                            await preloadImage(logoUrl);
+                        }
+                    }
+                    
+                    // Apply changes after image is preloaded
+                    els.forEach(el => {
+                        if (text) el.textContent = text;
+                        if (bg && logoUrl) {
+                            el.style.backgroundImage = `url('${logoUrl}')`;
+                            el.style.backgroundSize = 'cover';
+                            el.style.backgroundPosition = 'center';
+                            el.style.backgroundColor = 'transparent';
+                        }
+                    });
+                }
+                applyHexLogo();
+                try { window.applyHexLogo = applyHexLogo; } catch(_) {}
+                window.addEventListener('storage', (e) => {
+                    if (!e) return;
+                    if (e.key === 'pageOverrides:global') {
+                        if (applyTimer) clearTimeout(applyTimer);
+                        applyTimer = setTimeout(applyHexLogo, 200);
+                    }
+                });
+            } catch (_) {}
+        })();
+    </script>
+</body>
+</html>
